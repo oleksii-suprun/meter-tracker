@@ -1,0 +1,3 @@
+rootProject.name = 'meter-tracker'
+include 'meter-tracker-core',
+        'meter-tracker-web'

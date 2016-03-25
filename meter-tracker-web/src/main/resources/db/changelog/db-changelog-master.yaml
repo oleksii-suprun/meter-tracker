@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: schema.sql
+      author: asuprun
+      changes:
+        - sqlFile:
+            path: schema.sql
+  - changeSet:
+      id: data.sql
+      author: asuprun
+      changes:
+        - sqlFile:
+            path: data.sql

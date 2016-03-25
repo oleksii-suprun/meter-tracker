@@ -1,0 +1,42 @@
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'idea'
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    version = '1.0-SNAPSHOT'
+
+    ext {
+        openCvLibPath = System.getenv('OPENCV_JAVA_PATH')
+    }
+
+    repositories {
+        mavenCentral()
+        flatDir(name: 'openCvLocalRepo', dirs: "$openCvLibPath")
+    }
+
+    configurations {
+        compile.exclude module: 'commons-logging'
+    }
+
+    dependencies {
+        compile 'org.slf4j:slf4j-api:1.7.10'
+        compile 'org.slf4j:jcl-over-slf4j:1.7.10'
+        compile 'ch.qos.logback:logback-classic:1.1.3'
+        compile 'org.apache.commons:commons-lang3:3.3.2'
+
+        testCompile 'junit:junit:4.11'
+    }
+
+    idea {
+        module {
+            downloadJavadoc = true
+            downloadSources = true
+        }
+    }
+
+    test {
+        systemProperty 'java.library.path', "$openCvLibPath"
+        systemProperty 'java.awt.headless', true
+    }
+}

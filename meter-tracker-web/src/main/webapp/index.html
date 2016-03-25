@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html ng-app="app">
+<head lang="en">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <!--<base href="/">-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="resources/css/app.css">
+</head>
+<body>
+
+<div app-nav></div>
+<div class="container">
+    <div app-error></div>
+    <div ng-view></div>
+</div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular-route.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular-resource.min.js"></script>
+
+<script src="app/app.js"></script>
+
+<script src="app/controllers/app.recognition.controller.js"></script>
+<script src="app/controllers/app.indication.list.controller.js"></script>
+
+<script src="app/services/app.indication.service.js"></script>
+<script src="app/services/app.meter.service.js"></script>
+<script src="app/services/app.error.message.service.js"></script>
+
+<script src="app/components/filemodel/app.filemodel.directive.js"></script>
+<script src="app/components/validate/app.validate.directive.js"></script>
+<script src="app/components/nav/app.nav.directive.js"></script>
+<script src="app/components/upload/app.upload.directive.js"></script>
+<script src="app/components/upload/app.targetid.directive.js"></script>
+<script src="app/components/error/app.error.directive.js"></script>
+
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

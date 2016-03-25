@@ -1,0 +1,57 @@
+<div class="row">
+    <div class="col-md-4" ng-repeat="indication in vm.indications">
+        <form name="indicationForm" ng-submit="vm.submit(indication)" novalidate>
+            <div class="thumbnail">
+                <div class="panel panel-default">
+                    <img ng-src="rs/resource/{{indication.indicationImageId}}" data-holder-rendered="true" style="height: 50px; width: 100%;">
+
+                    <table class="digit-block">
+                        <tr>
+                            <td ng-repeat="digit in indication.digits" align="center">
+                                <img ng-src="data:image/jpeg;base64,{{digit.image}}" class="digit-img"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td ng-repeat="digit in indication.digits" align="center">
+                                <div>
+                                    <input type="text" ng-model="digit.value" class="form-control digit-label" maxlength="1" ng-change="vm.onDigitChange(digit)" required app-validate>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td ng-repeat="digit in indication.digits" align="center">
+                                <input type="checkbox" ng-model="digit.updated">
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="caption">
+                    <table class="table table-condensed">
+                        <thead>
+                        <tr>
+                            <td>Type</td>
+                            <td>{{indication.meterName}}</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Created</td>
+                            <td>{{indication.created | date}}</td>
+                        </tr>
+                        <tr>
+                            <td>Uploaded</td>
+                            <td>{{indication.uploaded | date}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <p>
+                        <input type="submit" class="btn btn-primary" name="Submit" ng-disabled="indicationForm.$invalid">
+                        <button type="button" class="btn btn-link" ng-click="vm.decline(indication)">Delete</button>
+                    </p>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

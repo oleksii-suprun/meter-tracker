@@ -1,0 +1,42 @@
+<div class="row">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Created</th>
+                <th>Uploaded</th>
+                <th>Value</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="indication in vm.indications | orderBy: 'created'">
+                <td>{{indication.created | date}}</td>
+                <td>{{indication.uploaded | date}}</td>
+                <td>{{indication.value}}</td>
+                <td>
+                    <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#imageModal" ng-click="vm.onViewImageClick($index)">
+                        <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                    </button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+
+<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="imageModalLabel">
+                    {{vm.indications[vm.viewIndex].created | date}}
+                </h4>
+            </div>
+            <div class="modal-body">
+                <img ng-src="rs/resource/{{vm.indications[vm.viewIndex].originalImageId}}" data-holder-rendered="true" class="img-responsive">
+            </div>
+        </div>
+    </div>
+</div>
+
