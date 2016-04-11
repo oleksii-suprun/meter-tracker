@@ -36,7 +36,6 @@ subprojects {
     }
 
     test {
-//        testLogging.showStandardStreams = true
         testLogging.exceptionFormat = 'full'
 
         systemProperty 'java.library.path', "$openCvLibPath"
