@@ -30,6 +30,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -41,6 +43,8 @@ import static org.junit.Assert.*;
 @ContextConfiguration(classes = {ApplicationConfig.class, RepositoryConfig.class, RestConfig.class})
 @ActiveProfiles(ApplicationConfig.Profiles.TEST)
 public class IndicationResourceTest {
+
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
     @Autowired
     private WebClient client;
@@ -64,7 +68,7 @@ public class IndicationResourceTest {
     }
 
     @Test
-    public void testGetUnrecognized() {
+    public void testGetUnrecognized() throws ParseException {
         client.query(PARAM_UNRECOGNIZED, true);
         List<IndicationDto> indications = new ArrayList<>(client.getCollection(IndicationDto.class));
 
@@ -75,8 +79,9 @@ public class IndicationResourceTest {
         assertEquals(5, indications.get(0).getOriginalImageId());
         assertEquals(6, indications.get(0).getIndicationImageId());
         assertEquals("Hot Water", indications.get(0).getMeterName());
-        assertEquals(new Date(1424427111000L), indications.get(0).getCreated());
-        assertEquals(new Date(1440061231436L), indications.get(0).getUploaded());
+
+        assertEquals(DATE_FORMAT.parse("2015-02-20 12:11:51.000"), indications.get(0).getCreated());
+        assertEquals(DATE_FORMAT.parse("2015-08-20 12:00:31.436"), indications.get(0).getUploaded());
         assertNull(indications.get(0).getValue());
     }
 
@@ -144,18 +149,18 @@ public class IndicationResourceTest {
     }
 
     @Test
-    public void testGet() {
+    public void testGet() throws ParseException {
         client.path(1);
         IndicationDto indication = client.get(IndicationDto.class);
 
         assertEquals(200, client.getResponse().getStatus());
         assertNotNull(indication);
         assertEquals(1, indication.getId());
-        assertEquals(137.019, indication.getValue().doubleValue(), 1e-6);
+        assertEquals(137.019, indication.getValue(), 1e-6);
         assertEquals(1, indication.getOriginalImageId());
         assertEquals(2, indication.getIndicationImageId());
-        assertEquals(1440061207856L, indication.getUploaded().getTime());
-        assertEquals(1424414816000L, indication.getCreated().getTime());
+        assertEquals(DATE_FORMAT.parse("2015-02-20 08:46:56.000"), indication.getCreated());
+        assertEquals(DATE_FORMAT.parse("2015-08-20 12:00:07.856"), indication.getUploaded());
         assertEquals("Cold Water", indication.getMeterName());
     }
 
@@ -198,7 +203,7 @@ public class IndicationResourceTest {
 
     @Test
     @DirtiesContext
-    public void testUpload() throws IOException {
+    public void testUpload() throws IOException, ParseException {
         client.type("multipart/form-data");
         client.type(MediaType.MULTIPART_FORM_DATA);
 
@@ -220,7 +225,7 @@ public class IndicationResourceTest {
         assertEquals(9, indication.getOriginalImageId());
         assertEquals(10, indication.getIndicationImageId());
         assertTrue(indication.getUploaded().before(new Date()));
-        assertEquals(1426842806000L, indication.getCreated().getTime());
+        assertEquals(DATE_FORMAT.parse("2015-03-20 11:13:26.000"), indication.getCreated());
         assertEquals("Electricity", indication.getMeterName());
     }
 
@@ -337,7 +342,7 @@ public class IndicationResourceTest {
         assertEquals(204, response.getStatus());
 
         Indication indication = indicationService.findById(3).get();
-        assertEquals(99999.999, indication.getValue().doubleValue(), 1e-6);
+        assertEquals(99999.999, indication.getValue(), 1e-6);
     }
 
     @Test
@@ -385,6 +390,6 @@ public class IndicationResourceTest {
         assertEquals(204, response.getStatus());
 
         Indication indication = indicationService.findById(3).get();
-        assertEquals(01234.567, indication.getValue().doubleValue(), 1e-6);
+        assertEquals(01234.567, indication.getValue(), 1e-6);
     }
 }

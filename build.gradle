@@ -36,6 +36,8 @@ subprojects {
     }
 
     test {
+        testLogging.exceptionFormat = 'full'
+
         systemProperty 'java.library.path', "$openCvLibPath"
         systemProperty 'java.awt.headless', true
     }
