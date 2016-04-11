@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/aleksey-suprun/meter-tracker.svg?branch=master)](https://travis-ci.org/aleksey-suprun/meter-tracker)
+
 # Meter Tracker
 The main goal of this project is to automate and simplify gathering indications from analog meter devices such as water meter,
 electricity meter, gas meter. As an input data it uses digital photos of meter device, made by mobile phone camera or any other 
