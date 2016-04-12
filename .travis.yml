@@ -11,18 +11,10 @@ env:
 
 cache:
   directories:
-    - $OPENCV_HOME
+    - $OPENCV_JAVA_PATH
 
 install:
-  - cd $HOME
-  - git clone git://github.com/Itseez/opencv.git --branch 3.1.0 --depth=1
-  - cd opencv
-  - mkdir build
-  - cd build
-  - cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=$OPENCV_HOME ..
-  - make -j4
-  - make install
-  - cd $TRAVIS_BUILD_DIR
+  - ./install-opencv.sh
 
 script:
   - ./gradlew clean test
