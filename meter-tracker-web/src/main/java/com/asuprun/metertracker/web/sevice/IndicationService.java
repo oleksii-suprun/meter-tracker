@@ -25,10 +25,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 import static com.asuprun.metertracker.core.utils.ImageUtils.bytesToImage;
 import static com.asuprun.metertracker.core.utils.ImageUtils.imageToJpgBytes;
@@ -118,8 +115,8 @@ public class IndicationService {
 
     private Optional<Date> readCreatedOnMetadata(byte[] bytes) {
         return readMetadata(bytes)
-                .map(m -> m.getDirectory(ExifSubIFDDirectory.class))
-                .map(d -> d.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL));
+                .map(m -> m.getFirstDirectoryOfType(ExifSubIFDDirectory.class))
+                .map(d -> d.getDateOriginal(TimeZone.getDefault()));
     }
 
     @Transactional
