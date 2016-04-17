@@ -225,7 +225,7 @@ public class IndicationResourceTest {
         assertEquals(9, indication.getOriginalImageId());
         assertEquals(10, indication.getIndicationImageId());
         assertTrue(indication.getUploaded().before(new Date()));
-        assertEquals(DATE_FORMAT.parse("2015-03-20 11:13:26.000"), indication.getCreated());
+        assertEquals(DATE_FORMAT.parse("2015-03-20 11:13:26.441"), indication.getCreated());
         assertEquals("Electricity", indication.getMeterName());
     }
 

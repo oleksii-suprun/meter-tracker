@@ -57,7 +57,7 @@ public class RestConfig extends SpringComponentScanServer {
     }
 
     @Override
-    protected List<Feature> getFeatures() {
+    public List<Feature> getFeatures() {
         return Arrays.asList(new LoggingFeature(), new JAXRSBeanValidationFeature());
     }
 
