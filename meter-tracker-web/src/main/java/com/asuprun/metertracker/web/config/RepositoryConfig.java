@@ -58,7 +58,6 @@ public class RepositoryConfig {
         factory.setDataSource(dataSource());
         factory.setJpaPropertyMap(new HashMap<String, Object>() {{
             put("hibernate.dialect", dialect);
-//            put("hibernate.hbm2ddl.auto", "create");
         }});
         factory.afterPropertiesSet();
         return factory.getObject();
