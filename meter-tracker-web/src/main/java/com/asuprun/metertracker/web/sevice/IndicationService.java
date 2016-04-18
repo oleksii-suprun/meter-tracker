@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import javax.persistence.criteria.Predicate;
 import javax.xml.bind.DatatypeConverter;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -145,17 +146,14 @@ public class IndicationService {
      * @return list of indications according to passed parameters.
      */
     public List<Indication> findByTypeAndState(Long meterId, Boolean unrecognized) {
-        if (meterId != null && unrecognized != null && unrecognized) {
-            return indicationRepository.findByMeterIdAndValueIsNull(meterId);
-        } else if (meterId != null && unrecognized != null) {
-            return indicationRepository.findByMeterIdAndValueIsNotNull(meterId);
-        } else if (meterId == null && unrecognized != null && unrecognized) {
-            return indicationRepository.findByValueIsNull();
-        } else if (meterId == null && unrecognized != null) {
-            return indicationRepository.findByValueIsNotNull();
-        }
-        // return all indications if type and unrecognized parameters are null
-        return indicationRepository.findAll();
+        return indicationRepository.findAll((root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            Optional.ofNullable(meterId).ifPresent(id -> predicates.add(cb.equal(root.get("meter").get("id"), id)));
+            Optional.ofNullable(unrecognized).ifPresent(u -> predicates.add(unrecognized
+                    ? cb.isNull(root.get("value"))
+                    : cb.isNotNull(root.get("value"))));
+            return cb.and(predicates.toArray(new Predicate[predicates.size()]));
+        });
     }
 
     public void delete(long id) {

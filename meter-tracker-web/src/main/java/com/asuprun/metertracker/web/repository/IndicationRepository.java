@@ -2,13 +2,14 @@ package com.asuprun.metertracker.web.repository;
 
 import com.asuprun.metertracker.web.domain.Indication;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface IndicationRepository extends JpaRepository<Indication, Long> {
+public interface IndicationRepository extends JpaRepository<Indication, Long>, JpaSpecificationExecutor<Indication> {
 
     List<Indication> findByValueIsNull();
 
