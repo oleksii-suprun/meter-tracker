@@ -22,7 +22,7 @@ public class IndicationImageProcessorImpl implements IndicationImageProcessor {
     public static final int DIMENSIONS_RATIO = 4;
 
     @Override
-    public BufferedImage extractIndication(BufferedImage source) throws BorderNotFoundException {
+    public BufferedImage extractIndicationRegion(BufferedImage source) throws BorderNotFoundException {
         Mat original = ImageUtils.imageToMat(source);
 
         // greyscale and threshold source image

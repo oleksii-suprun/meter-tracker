@@ -56,25 +56,25 @@ public class IndicationImageProcessorTest {
     @Test
     public void testExtract() throws BorderNotFoundException, IOException {
         // data/output/extracted/IMG_0021_IN.JPG
-        BufferedImage result = indicationImageProcessor.extractIndication(originalImages.get(0));
+        BufferedImage result = indicationImageProcessor.extractIndicationRegion(originalImages.get(0));
         assertEquals(extractedImages.get(0).getHeight(), result.getHeight());
         assertEquals(extractedImages.get(0).getWidth(), result.getWidth());
         assertTrue(TestUtils.compareByContours(extractedImages.get(0), result));
 
         // data/output/extracted/IMG_0023_IN.JPG
-        result = indicationImageProcessor.extractIndication(originalImages.get(1));
+        result = indicationImageProcessor.extractIndicationRegion(originalImages.get(1));
         assertEquals(extractedImages.get(1).getHeight(), result.getHeight());
         assertEquals(extractedImages.get(1).getWidth(), result.getWidth());
         assertTrue(TestUtils.compareByContours(extractedImages.get(1), result));
 
         // data/output/extracted/IMG_0024_IN.JPG
-        result = indicationImageProcessor.extractIndication(originalImages.get(2));
+        result = indicationImageProcessor.extractIndicationRegion(originalImages.get(2));
         assertEquals(extractedImages.get(2).getHeight(), result.getHeight());
         assertEquals(extractedImages.get(2).getWidth(), result.getWidth());
         assertTrue(TestUtils.compareByContours(extractedImages.get(2), result));
 
         // data/output/extracted/IMG_0025_IN.JPG
-        result = indicationImageProcessor.extractIndication(originalImages.get(3));
+        result = indicationImageProcessor.extractIndicationRegion(originalImages.get(3));
         assertEquals(extractedImages.get(3).getHeight(), result.getHeight());
         assertEquals(extractedImages.get(3).getWidth(), result.getWidth());
         assertTrue(TestUtils.compareByContours(extractedImages.get(3), result));
