@@ -23,7 +23,7 @@ public interface IndicationImageProcessor {
      * @throws BorderNotFoundException if borders of numeric indicator could not be found.
      * @since 1.0
      */
-    BufferedImage extractIndication(BufferedImage source) throws BorderNotFoundException;
+    BufferedImage extractIndicationRegion(BufferedImage source) throws BorderNotFoundException;
 
     List<BufferedImage> extractDigits(BufferedImage source, int digits);
 }

@@ -88,7 +88,7 @@ public class IndicationService {
 
         ResourceBinding bindingIndication = new ResourceBinding();
         try {
-            bytes = imageToJpgBytes(extractor.extractIndication(bytesToImage(bytes)));
+            bytes = imageToJpgBytes(extractor.extractIndicationRegion(bytesToImage(bytes)));
             bindingIndication.setResourceBindingId(new ResourceBindingId(INDICATION, indication));
             bindingIndication.setResource(resourceRepository.save(new Resource(bytes)));
         } catch (BorderNotFoundException e) {

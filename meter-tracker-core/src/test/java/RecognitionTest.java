@@ -46,7 +46,7 @@ public class RecognitionTest {
         BufferedImage image = ImageIO.read(new File(url.toURI()));
 
         IndicationImageProcessor indicationImageProcessor = new IndicationImageProcessorImpl();
-        image = indicationImageProcessor.extractIndication(image);
+        image = indicationImageProcessor.extractIndicationRegion(image);
 
         int width = image.getWidth() / 8;
         for (int i = 0; i < 8; i++) {
