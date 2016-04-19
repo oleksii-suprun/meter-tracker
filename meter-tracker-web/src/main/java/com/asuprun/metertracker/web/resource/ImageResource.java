@@ -8,9 +8,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
-@Path("/resource")
-@Api(value = "/resource", description = "Operation about images")
+@Path(ImageResource.PATH)
+@Api(ImageResource.PATH)
 public interface ImageResource {
+
+    String PATH = "/resource";
 
     @GET
     @Path("/{id}")
