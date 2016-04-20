@@ -1,5 +1,14 @@
 apply plugin: 'war'
 
+repositories {
+    ivy {
+        url "https://github.com"
+        layout 'pattern', {
+            artifact '/[organisation]/[module]/archive/[revision].[ext]'
+        }
+    }
+}
+
 dependencies {
     compile project(':meter-tracker-core')
 
@@ -22,4 +31,14 @@ dependencies {
     compile 'org.yaml:snakeyaml:1.17'
 
     providedCompile 'javax:javaee-web-api:7.0'
+    providedCompile 'swagger-api:swagger-ui:v2.1.4:@zip'
+}
+
+war {
+    from(zipTree(project.configurations.compile.find { it.name.startsWith("swagger-ui") })) {
+        includeEmptyDirs = false
+        include '**/dist/**'
+        rename('index.html', 'swagger.html')
+        eachFile { fcd -> fcd.relativePath = new RelativePath(true, fcd.relativePath.segments.tail().tail()) }
+    }
 }
