@@ -2,6 +2,7 @@ package com.asuprun.metertracker.web.config;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import io.swagger.jaxrs.config.BeanConfig;
+import io.swagger.models.Info;
 import org.apache.cxf.feature.Feature;
 import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -44,6 +45,8 @@ public class RestConfig extends SpringComponentScanServer {
         beanConfig.setResourcePackage("com.asuprun.metertracker.web.resource");
         beanConfig.setBasePath(API_BASE_PATH);
         beanConfig.setScan(true);
+        beanConfig.setInfo(new Info().title("Meter Tracker Application"));
+        beanConfig.setSchemes(new String[]{"http"});
         return beanConfig;
     }
 

@@ -18,8 +18,13 @@ public class SwaggerFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         URL requestUrl = new URL(request.getRequestURL().toString());
-        String swaggerJsonUrl = requestUrl.getProtocol() + "://" + requestUrl.getHost() + ":" + requestUrl.getPort() + request.getContextPath() + "/" + RestConfig.API_BASE_PATH + "/swagger.json";
-        String url = request.getContextPath() + "/swagger/index.html?url=" + swaggerJsonUrl;
+        String swaggerJsonUrl = String.format("%s://%s:%s%s/%s//swagger.json",
+                requestUrl.getProtocol(),
+                requestUrl.getHost(),
+                requestUrl.getPort(),
+                request.getContextPath(),
+                RestConfig.API_BASE_PATH);
+        String url = request.getContextPath() + "/swagger.html?url=" + swaggerJsonUrl;
         response.sendRedirect(url);
     }
 }
