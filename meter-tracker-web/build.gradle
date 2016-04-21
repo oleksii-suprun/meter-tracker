@@ -1,5 +1,7 @@
 apply plugin: 'war'
 
+def swaggerUiDir = "${buildDir}/swagger-ui"
+
 repositories {
     ivy {
         url "https://github.com"
@@ -34,11 +36,19 @@ dependencies {
     providedCompile 'swagger-api:swagger-ui:v2.1.4:@zip'
 }
 
+task swaggerUi(type: Copy) {
+    def zipFile = project.configurations.compile.find { it.name.startsWith("swagger-ui") }
+    def outputDir = file(swaggerUiDir)
+
+    includeEmptyDirs = false
+    from zipTree(zipFile)
+    into outputDir
+    include '**/dist/**'
+    rename('index.html', 'swagger.html')
+    eachFile { fcd -> fcd.relativePath = new RelativePath(true, fcd.relativePath.segments.tail().tail()) }
+}
+
 war {
-    from(zipTree(project.configurations.compile.find { it.name.startsWith("swagger-ui") })) {
-        includeEmptyDirs = false
-        include '**/dist/**'
-        rename('index.html', 'swagger.html')
-        eachFile { fcd -> fcd.relativePath = new RelativePath(true, fcd.relativePath.segments.tail().tail()) }
-    }
+    dependsOn "swaggerUi"
+    from swaggerUiDir
 }
