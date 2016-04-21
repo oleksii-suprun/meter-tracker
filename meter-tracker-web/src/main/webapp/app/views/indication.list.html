@@ -14,7 +14,7 @@
                 <td>{{indication.uploaded | date}}</td>
                 <td>{{indication.value}}</td>
                 <td>
-                    <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#imageModal" ng-click="vm.onViewImageClick($index)">
+                    <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#imageModal" ng-click="vm.onViewImageClick(indication)">
                         <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
                     </button>
                 </td>
@@ -30,11 +30,11 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" id="imageModalLabel">
-                    {{vm.indications[vm.viewIndex].created | date}}
+                    {{vm.selectedIndication.created | date}}
                 </h4>
             </div>
             <div class="modal-body">
-                <img ng-src="rs/resource/{{vm.indications[vm.viewIndex].originalImageId}}" data-holder-rendered="true" class="img-responsive">
+                <img ng-src="rs/resource/{{vm.selectedIndication.originalImageId}}" data-holder-rendered="true" class="img-responsive">
             </div>
         </div>
     </div>
