@@ -18,7 +18,7 @@ public class SwaggerFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         URL requestUrl = new URL(request.getRequestURL().toString());
-        String swaggerJsonUrl = String.format("%s://%s:%s%s/%s//swagger.json",
+        String swaggerJsonUrl = String.format("%s://%s:%s%s/%s/swagger.json",
                 requestUrl.getProtocol(),
                 requestUrl.getHost(),
                 requestUrl.getPort(),
