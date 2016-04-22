@@ -11,12 +11,12 @@
     function IndicationListController($location, indicationService, errorMessageService) {
         var vm = this;
         vm.indications = [];
-        vm.viewIndex = null;
+        vm.selectedIndication = null;
 
         init();
 
-        this.onViewImageClick = function(index) {
-            vm.viewIndex = index;
+        this.onViewImageClick = function(indication) {
+            vm.selectedIndication = indication;
         };
 
         function init() {
