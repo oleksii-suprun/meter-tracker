@@ -225,10 +225,10 @@ public class IndicationResourceTest {
 
         assertEquals(201, client.getResponse().getStatus());
         assertNotNull(indication);
-        assertEquals(5, indication.getId());
+        assertEquals(5, client.getCollection(IndicationDto.class).size());
         assertNull(indication.getValue());
-        assertEquals(9, indication.getOriginalImageId());
-        assertEquals(10, indication.getIndicationImageId());
+        assertTrue(indication.getOriginalImageId() > 0);
+        assertTrue(indication.getIndicationImageId() > indication.getOriginalImageId());
         assertTrue(indication.getUploaded().before(new Date()));
         assertEquals(DATE_FORMAT.parse("2015-04-22 08:43:49.255"), indication.getCreated());
         assertEquals("Electricity", indication.getMeterName());

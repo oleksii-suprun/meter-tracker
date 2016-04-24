@@ -3,6 +3,7 @@ package com.asuprun.metertracker.web.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
 import java.util.*;
 
 @SuppressWarnings("unused")
@@ -32,6 +33,10 @@ public class Indication {
     @JsonIgnore
     @Column(nullable = false, unique = true, updatable = false)
     private String hash;
+
+    @Column
+    @Min(0)
+    private Integer consumption;
 
     public Indication() {
         this.images = new HashMap<>();
@@ -91,5 +96,13 @@ public class Indication {
 
     public void setHash(String hash) {
         this.hash = hash;
+    }
+
+    public Integer getConsumption() {
+        return consumption;
+    }
+
+    public void setConsumption(Integer consumption) {
+        this.consumption = consumption;
     }
 }

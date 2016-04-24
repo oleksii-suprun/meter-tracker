@@ -131,7 +131,7 @@ public class IndicationService {
     }
 
     public Optional<Indication> findById(long id) {
-        return Optional.ofNullable(indicationRepository.findOne(id));
+        return indicationRepository.findById(id);
     }
 
     /**
@@ -189,20 +189,15 @@ public class IndicationService {
             throw new IllegalArgumentException("Incorrect number of digits");
         }
         digits.stream().filter(d -> d.getImage() != null).map(digitRepository::save).collect(toList());
-        String[] value = splitValue(digits.stream().map(Digit::getValue).collect(joining()), indication.getMeter());
-
-        indication.setValue(Double.parseDouble(String.join(".", value[0], value[1])));
+        indication.setValue(parseValue(digits.stream().map(Digit::getValue).collect(joining()), indication.getMeter()));
         indicationRepository.save(indication);
 
         trainRecognizer();
     }
 
-    private String[] splitValue(String value, Meter meter) {
+    private double parseValue(String value, Meter meter) {
         int splitIndex = meter.getCapacity() - meter.getMinorDigits();
-        return new String[]{
-                value.substring(0, splitIndex),
-                value.substring(splitIndex)
-        };
+        return Double.parseDouble(String.join(".", value.substring(0, splitIndex), value.substring(splitIndex)));
     }
 
     private void trainRecognizer() {
