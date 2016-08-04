@@ -11,6 +11,8 @@ import com.asuprun.metertracker.web.dto.DigitDto;
 import com.asuprun.metertracker.web.dto.IndicationDto;
 import com.asuprun.metertracker.web.resource.response.ErrorResponse;
 import com.asuprun.metertracker.web.sevice.IndicationService;
+import com.github.springtestdbunit.DbUnitTestExecutionListener;
+import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
@@ -22,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.ws.rs.core.MediaType;
@@ -38,10 +41,13 @@ import java.util.stream.IntStream;
 
 import static com.asuprun.metertracker.web.resource.IndicationResource.*;
 import static org.junit.Assert.*;
+import static org.springframework.test.context.TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {ApplicationConfig.class, RepositoryConfig.class, RestConfig.class})
 @ActiveProfiles(ApplicationConfig.Profiles.TEST)
+@TestExecutionListeners(listeners = {DbUnitTestExecutionListener.class}, mergeMode = MERGE_WITH_DEFAULTS)
+@DatabaseSetup("classpath:datasets/dataset.xml")
 public class IndicationResourceTest {
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
@@ -80,8 +86,8 @@ public class IndicationResourceTest {
         assertEquals(6, indications.get(0).getIndicationImageId());
         assertEquals("Hot Water", indications.get(0).getMeterName());
 
-        assertEquals(DATE_FORMAT.parse("2015-02-20 12:11:51.000"), indications.get(0).getCreated());
-        assertEquals(DATE_FORMAT.parse("2015-08-20 12:00:31.436"), indications.get(0).getUploaded());
+        assertEquals(DATE_FORMAT.parse("2015-03-20 08:12:52.000"), indications.get(0).getCreated());
+        assertEquals(DATE_FORMAT.parse("2015-03-20 11:23:42.000"), indications.get(0).getUploaded());
         assertNull(indications.get(0).getValue());
     }
 
@@ -156,11 +162,11 @@ public class IndicationResourceTest {
         assertEquals(200, client.getResponse().getStatus());
         assertNotNull(indication);
         assertEquals(1, indication.getId());
-        assertEquals(137.019, indication.getValue(), 1e-6);
+        assertEquals(0.087, indication.getValue(), 1e-6);
         assertEquals(1, indication.getOriginalImageId());
         assertEquals(2, indication.getIndicationImageId());
-        assertEquals(DATE_FORMAT.parse("2015-02-20 08:46:56.000"), indication.getCreated());
-        assertEquals(DATE_FORMAT.parse("2015-08-20 12:00:07.856"), indication.getUploaded());
+        assertEquals(DATE_FORMAT.parse("2015-02-20 09:12:34.000"), indication.getCreated());
+        assertEquals(DATE_FORMAT.parse("2015-02-20 10:12:00.000"), indication.getUploaded());
         assertEquals("Cold Water", indication.getMeterName());
     }
 
@@ -204,11 +210,10 @@ public class IndicationResourceTest {
     @Test
     @DirtiesContext
     public void testUpload() throws IOException, ParseException {
-        client.type("multipart/form-data");
         client.type(MediaType.MULTIPART_FORM_DATA);
 
-        final String fileName = "IMG_0055.JPG";
-        final long meterId = 1;
+        final String fileName = "images/cold/00004_006.jpg";
+        final long meterId = 1; // electric meter
 
         IndicationDto indication;
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName)) {
@@ -225,15 +230,15 @@ public class IndicationResourceTest {
         assertEquals(9, indication.getOriginalImageId());
         assertEquals(10, indication.getIndicationImageId());
         assertTrue(indication.getUploaded().before(new Date()));
-        assertEquals(DATE_FORMAT.parse("2015-03-20 11:13:26.441"), indication.getCreated());
+        assertEquals(DATE_FORMAT.parse("2015-04-22 08:43:49.255"), indication.getCreated());
         assertEquals("Electricity", indication.getMeterName());
     }
 
     @Test
     public void testUploadConflict() throws IOException {
-        client.type("multipart/form-data");
+        client.type(MediaType.MULTIPART_FORM_DATA);
 
-        final String fileName = "IMG_0021.JPG";
+        final String fileName = "images/cold/00000_087.jpg";
         final long meterId = 1;
 
         Response response;
@@ -254,7 +259,7 @@ public class IndicationResourceTest {
 
     @Test
     public void testUploadBadImage() throws IOException {
-        client.type("multipart/form-data");
+        client.type(MediaType.MULTIPART_FORM_DATA);
 
         final String fileName = "application.properties";
         final long meterId = 1;
@@ -277,7 +282,7 @@ public class IndicationResourceTest {
 
     @Test
     public void testUploadNoIndication() throws IOException {
-        client.type("multipart/form-data");
+        client.type(MediaType.MULTIPART_FORM_DATA);
 
         final long meterId = 1;
 
