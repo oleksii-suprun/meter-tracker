@@ -34,6 +34,12 @@ dependencies {
 
     providedCompile 'javax:javaee-web-api:7.0'
     providedCompile 'swagger-api:swagger-ui:v2.1.4:@zip'
+
+    testCompile 'com.github.springtestdbunit:spring-test-dbunit:1.3.0'
+    testCompile('org.dbunit:dbunit:2.5.2') {
+        exclude module: 'junit'
+    }
+
 }
 
 task swaggerUi(type: Copy) {

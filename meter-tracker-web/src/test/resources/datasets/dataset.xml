@@ -1,0 +1,50 @@
+<dataset>
+    <DIGIT id="1" image="./src/test/resources/images/digits/0/1.jpg" value="0"/>
+    <DIGIT id="2" image="./src/test/resources/images/digits/0/2.jpg" value="0"/>
+    <DIGIT id="3" image="./src/test/resources/images/digits/0/3.jpg" value="0"/>
+    <DIGIT id="4" image="./src/test/resources/images/digits/0/4.jpg" value="0"/>
+    <DIGIT id="5" image="./src/test/resources/images/digits/0/5.jpg" value="0"/>
+    <DIGIT id="6" image="./src/test/resources/images/digits/0/6.jpg" value="0"/>
+    <DIGIT id="7" image="./src/test/resources/images/digits/0/7.jpg" value="0"/>
+    <DIGIT id="8" image="./src/test/resources/images/digits/0/8.jpg" value="0"/>
+    <DIGIT id="9" image="./src/test/resources/images/digits/1/1.jpg" value="1"/>
+    <DIGIT id="10" image="./src/test/resources/images/digits/1/2.jpg" value="1"/>
+    <DIGIT id="11" image="./src/test/resources/images/digits/1/3.jpg" value="1"/>
+    <DIGIT id="12" image="./src/test/resources/images/digits/2/1.jpg" value="2"/>
+    <DIGIT id="13" image="./src/test/resources/images/digits/2/2.jpg" value="2"/>
+    <DIGIT id="14" image="./src/test/resources/images/digits/3/1.jpg" value="3"/>
+    <DIGIT id="15" image="./src/test/resources/images/digits/3/2.jpg" value="3"/>
+    <DIGIT id="16" image="./src/test/resources/images/digits/3/3.jpg" value="3"/>
+    <DIGIT id="17" image="./src/test/resources/images/digits/4/1.jpg" value="4"/>
+    <DIGIT id="18" image="./src/test/resources/images/digits/4/2.jpg" value="4"/>
+    <DIGIT id="19" image="./src/test/resources/images/digits/5/1.jpg" value="5"/>
+    <DIGIT id="20" image="./src/test/resources/images/digits/5/2.jpg" value="5"/>
+    <DIGIT id="21" image="./src/test/resources/images/digits/5/3.jpg" value="5"/>
+    <DIGIT id="22" image="./src/test/resources/images/digits/7/1.jpg" value="7"/>
+    <DIGIT id="23" image="./src/test/resources/images/digits/8/1.jpg" value="8"/>
+    <DIGIT id="24" image="./src/test/resources/images/digits/8/2.jpg" value="8"/>
+    <DIGIT id="25" image="./src/test/resources/images/digits/9/1.jpg" value="9"/>
+
+    <INDICATION id="1" created="2015-02-20 09:12:34.000000000" hash="29EB0BC0ECF5DCC5C6A6239D6427789C7B4C1CD8252A18A8A2E5A21A17998F85" meter_id="2" uploaded="2015-02-20 10:12:00.000000000" value="0.087"/>
+    <INDICATION id="2" created="2015-02-20 09:13:21.000000000" hash="BC4F71326B4BFE3F9265392D74A05773FB7463DDA9BEE922A627DC4556D8A9F7" meter_id="3" uploaded="2015-02-20 10:12:34.000000000" value="0.102"/>
+    <INDICATION id="3" created="2015-03-20 08:12:52.000000000" hash="AF657B3B19D8541A0B476209D395662F1F18C4350891D677F7FEF184990504B7" meter_id="3" uploaded="2015-03-20 11:23:42.000000000"/>
+    <INDICATION id="4" created="2015-03-20 08:13:32.000000000" hash="78BE3571F1966473AC9794908F8123B1AF3DC002169BFF01FDE4898411B50746" meter_id="2" uploaded="2015-03-20 11:24:22.000000000" value="2.084"/>
+
+    <RESOURCE id="1" data="./src/test/resources/images/cold/00000_087.jpg"/>
+    <RESOURCE id="2" data="./src/test/resources/images/cold/00000_087-m.jpg"/>
+    <RESOURCE id="3" data="./src/test/resources/images/hot/00000_102.jpg"/>
+    <RESOURCE id="4" data="./src/test/resources/images/hot/00000_102-m.jpg"/>
+    <RESOURCE id="5" data="./src/test/resources/images/hot/00001_701.jpg"/>
+    <RESOURCE id="6" data="./src/test/resources/images/hot/00001_701-m.jpg"/>
+    <RESOURCE id="7" data="./src/test/resources/images/cold/00002_084.jpg"/>
+    <RESOURCE id="8" data="./src/test/resources/images/cold/00002_084-m.jpg"/>
+
+    <RESOURCE_BINDING type="0" indication_id="1" resource_id="1"/>
+    <RESOURCE_BINDING type="1" indication_id="1" resource_id="2"/>
+    <RESOURCE_BINDING type="0" indication_id="2" resource_id="3"/>
+    <RESOURCE_BINDING type="1" indication_id="2" resource_id="4"/>
+    <RESOURCE_BINDING type="0" indication_id="3" resource_id="5"/>
+    <RESOURCE_BINDING type="1" indication_id="3" resource_id="6"/>
+    <RESOURCE_BINDING type="0" indication_id="4" resource_id="7"/>
+    <RESOURCE_BINDING type="1" indication_id="4" resource_id="8"/>
+</dataset>
