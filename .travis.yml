@@ -9,9 +9,15 @@ jdk:
 env:
   - OPENCV_HOME=$HOME/opencv OPENCV_JAVA_PATH=$OPENCV_HOME/share/OpenCV/java
 
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
 cache:
   directories:
     - $OPENCV_JAVA_PATH
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
 
 install:
   - ./install-opencv.sh
