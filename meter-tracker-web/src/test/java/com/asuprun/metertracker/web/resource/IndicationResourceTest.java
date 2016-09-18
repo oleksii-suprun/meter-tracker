@@ -37,7 +37,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static com.asuprun.metertracker.web.resource.IndicationResource.*;
 import static org.junit.Assert.*;
@@ -287,7 +286,7 @@ public class IndicationResourceTest {
         final long meterId = 1;
 
         Response response;
-        byte[] bytes = ImageUtils.imageToJpgBytes(new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB));
+        byte[] bytes = ImageUtils.imageToJpgBytes(new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB));
         try (InputStream inputStream = new ByteArrayInputStream(bytes)) {
             MultipartBody body = new MultipartBody(Arrays.asList(
                     new Attachment("file", inputStream, new ContentDisposition("attachment;filename=test.jpg")),
@@ -336,25 +335,26 @@ public class IndicationResourceTest {
     public void testPostDigits() {
         client.path(3).path("digits");
 
-        final BufferedImage image = new BufferedImage(10, 10, BufferedImage.TYPE_BYTE_GRAY);
-        List<DigitDto> digits = IntStream.range(0, 8)
-                .mapToObj(i -> ImageUtils.imageToJpgBytes(image))
-                .map(b -> new Digit(b, String.valueOf(9)))
+        final BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_BYTE_GRAY);
+        List<DigitDto> digits = "00001701".chars()
+                .mapToObj(i -> new Digit(ImageUtils.imageToJpgBytes(image), String.valueOf((char) i)))
                 .map(DigitDto::toDto)
                 .collect(Collectors.toList());
         Response response = client.post(digits);
 
-        assertEquals(204, response.getStatus());
+        assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
 
-        Indication indication = indicationService.findById(3).get();
-        assertEquals(99999.999, indication.getValue(), 1e-6);
+        Optional<Indication> indication = indicationService.findById(3);
+        assertTrue(indication.isPresent());
+        assertEquals(1.701, indication.get().getValue(), 1e-6);
+        assertEquals(1, indication.get().getConsumption().intValue());
     }
 
     @Test
     public void testPostDigitsEmptyValue() {
         client.path(3).path("digits");
 
-        final BufferedImage image = new BufferedImage(10, 10, BufferedImage.TYPE_BYTE_GRAY);
+        final BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_BYTE_GRAY);
         Response response = client.post(Collections.singletonList(
                 DigitDto.toDto(new Digit(ImageUtils.imageToJpgBytes(image), ""))));
 
@@ -370,7 +370,7 @@ public class IndicationResourceTest {
     public void testPostDigitsNull() {
         client.path(3).path("digits");
 
-        final BufferedImage image = new BufferedImage(10, 10, BufferedImage.TYPE_BYTE_GRAY);
+        final BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_BYTE_GRAY);
         Response response = client.post(Collections.singletonList(
                 DigitDto.toDto(new Digit(ImageUtils.imageToJpgBytes(image), null))));
 
@@ -386,15 +386,17 @@ public class IndicationResourceTest {
     @DirtiesContext
     public void testPostDigitsNoImage() {
         client.path(3).path("digits");
-        List<DigitDto> digits = IntStream.range(0, 8)
-                .mapToObj(i -> new Digit(null, String.valueOf(i)))
+        List<DigitDto> digits = "01234567".chars()
+                .mapToObj(i -> new Digit(null, String.valueOf((char) i)))
                 .map(DigitDto::toDto)
                 .collect(Collectors.toList());
         Response response = client.post(digits);
 
         assertEquals(204, response.getStatus());
 
-        Indication indication = indicationService.findById(3).get();
-        assertEquals(01234.567, indication.getValue(), 1e-6);
+        Optional<Indication> indication = indicationService.findById(3);
+        assertTrue(indication.isPresent());
+        assertEquals(01234.567, indication.get().getValue(), 1e-6);
+        assertEquals(1234, indication.get().getConsumption().intValue());
     }
 }

@@ -44,20 +44,24 @@ public class IndicationService {
     private IndicationImageProcessor extractor;
     private DigitRecognizer recognizer;
 
-    @Autowired
     private IndicationRepository indicationRepository;
-
-    @Autowired
     private DigitRepository digitRepository;
-
-    @Autowired
     private ResourceRepository resourceRepository;
-
-    @Autowired
     private ResourceBindingRepository resourceBindingRepository;
+    private MeterRepository meterRepository;
 
     @Autowired
-    private MeterRepository meterRepository;
+    public IndicationService(IndicationRepository indicationRepository,
+                             DigitRepository digitRepository,
+                             ResourceRepository resourceRepository,
+                             ResourceBindingRepository resourceBindingRepository,
+                             MeterRepository meterRepository) {
+        this.indicationRepository = indicationRepository;
+        this.digitRepository = digitRepository;
+        this.resourceRepository = resourceRepository;
+        this.resourceBindingRepository = resourceBindingRepository;
+        this.meterRepository = meterRepository;
+    }
 
     @PostConstruct
     private void init() {
@@ -188,11 +192,25 @@ public class IndicationService {
                     indication.getMeter().getCapacity(), digits.size());
             throw new IllegalArgumentException("Incorrect number of digits");
         }
-        digits.stream().filter(d -> d.getImage() != null).map(digitRepository::save).collect(toList());
-        indication.setValue(parseValue(digits.stream().map(Digit::getValue).collect(joining()), indication.getMeter()));
+        digits.stream().filter(d -> d.getImage() != null).forEach(digitRepository::save);
+
+        double value = parseValue(digits.stream().map(Digit::getValue).collect(joining()), indication.getMeter());
+        indication.setValue(value);
+        indication.setConsumption(calculateConsumption(indication.getMeter().getId(), indication.getCreated(), value));
         indicationRepository.save(indication);
 
         trainRecognizer();
+    }
+
+    private int calculateConsumption(long meterId, Date created, double value) {
+        indicationRepository.findRecognizedAfter(meterId, created).ifPresent(i -> {
+            i.setConsumption((int) Math.floor(i.getValue()) - ((int) value));
+            indicationRepository.save(i);
+        });
+
+        return indicationRepository.findRecognizedBefore(meterId, created)
+                .map(i -> ((int) value) - (int) Math.floor(i.getValue()))
+                .orElse(0);
     }
 
     private double parseValue(String value, Meter meter) {
@@ -217,8 +235,8 @@ public class IndicationService {
             return DatatypeConverter.printHexBinary(digest.digest());
         } catch (NoSuchAlgorithmException e) {
             logger.warn("Cannot calculate image hash.", e);
+            throw new RuntimeException("Exception during image hash calculation", e);
         }
-        return null;
     }
 
 }

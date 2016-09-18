@@ -21,6 +21,7 @@ public class IndicationDto {
     private Date uploaded;
     private Date created;
     private String meterName;
+    private Integer consumption;
 
     public long getId() {
         return id;
@@ -78,6 +79,14 @@ public class IndicationDto {
         this.meterName = meterName;
     }
 
+    public Integer getConsumption() {
+        return consumption;
+    }
+
+    public void setConsumption(Integer consumption) {
+        this.consumption = consumption;
+    }
+
     public static IndicationDto toDto(Indication indication) {
         if (indication == null) {
             return null;
@@ -90,6 +99,7 @@ public class IndicationDto {
         dto.uploaded = indication.getUploaded();
         dto.created = indication.getCreated();
         dto.meterName = indication.getMeter().getName();
+        dto.consumption = indication.getConsumption();
         return dto;
     }
 
