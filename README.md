@@ -1,4 +1,3 @@
-[![Stories in Ready](https://badge.waffle.io/aleksey-suprun/meter-tracker.png?label=ready&title=Ready)](https://waffle.io/aleksey-suprun/meter-tracker)
 [![Build Status](https://travis-ci.org/aleksey-suprun/meter-tracker.svg?branch=master)](https://travis-ci.org/aleksey-suprun/meter-tracker)
 
 # Meter Tracker

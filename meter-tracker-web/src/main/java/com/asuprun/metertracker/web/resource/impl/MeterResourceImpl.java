@@ -2,7 +2,7 @@ package com.asuprun.metertracker.web.resource.impl;
 
 import com.asuprun.metertracker.web.domain.Meter;
 import com.asuprun.metertracker.web.resource.MeterResource;
-import com.asuprun.metertracker.web.sevice.MeterService;
+import com.asuprun.metertracker.web.service.MeterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

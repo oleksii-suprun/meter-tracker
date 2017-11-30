@@ -1,4 +1,4 @@
-package com.asuprun.metertracker.web.sevice;
+package com.asuprun.metertracker.web.service;
 
 import com.asuprun.metertracker.web.domain.Meter;
 import com.asuprun.metertracker.web.repository.MeterRepository;

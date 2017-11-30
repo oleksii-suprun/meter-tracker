@@ -10,7 +10,7 @@ import com.asuprun.metertracker.web.domain.Indication;
 import com.asuprun.metertracker.web.dto.DigitDto;
 import com.asuprun.metertracker.web.dto.IndicationDto;
 import com.asuprun.metertracker.web.resource.response.ErrorResponse;
-import com.asuprun.metertracker.web.sevice.IndicationService;
+import com.asuprun.metertracker.web.service.IndicationService;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.apache.cxf.jaxrs.client.WebClient;

@@ -13,7 +13,7 @@ import java.nio.file.Paths;
 
 @Configuration
 @PropertySource("classpath:application.properties")
-@ComponentScan("com.asuprun.metertracker.web.sevice")
+@ComponentScan("com.asuprun.metertracker.web.service")
 public class ApplicationConfig {
 
     static {

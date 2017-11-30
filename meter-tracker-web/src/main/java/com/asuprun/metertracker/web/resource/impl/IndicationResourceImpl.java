@@ -3,7 +3,7 @@ package com.asuprun.metertracker.web.resource.impl;
 import com.asuprun.metertracker.web.dto.DigitDto;
 import com.asuprun.metertracker.web.dto.IndicationDto;
 import com.asuprun.metertracker.web.resource.IndicationResource;
-import com.asuprun.metertracker.web.sevice.IndicationService;
+import com.asuprun.metertracker.web.service.IndicationService;
 import org.apache.commons.io.IOUtils;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.slf4j.Logger;

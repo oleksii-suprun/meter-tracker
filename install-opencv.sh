@@ -2,7 +2,7 @@
 
 set -e
 
-OPENCV_VERSION=3.1.0
+OPENCV_VERSION=3.3.1
 
 if [[ -d "$OPENCV_JAVA_PATH" && "$(ls -A $OPENCV_JAVA_PATH)" ]]; then
     echo "OpenCV already installed. Installation will be skipped."
