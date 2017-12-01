@@ -1,16 +1,5 @@
 apply plugin: 'war'
 
-def swaggerUiDir = "${buildDir}/swagger-ui"
-
-repositories {
-    ivy {
-        url "https://github.com"
-        layout 'pattern', {
-            artifact '/[organisation]/[module]/archive/[revision].[ext]'
-        }
-    }
-}
-
 dependencies {
     compile project(':meter-tracker-core')
 
@@ -28,33 +17,20 @@ dependencies {
     compile 'org.apache.cxf:cxf-rt-frontend-jaxrs:3.1.6'
     compile 'org.apache.cxf:cxf-rt-transports-local:3.1.6'
     compile 'org.apache.cxf:cxf-rt-rs-client:3.1.6'
-    compile 'io.swagger:swagger-jaxrs:1.5.8'
+    compile 'io.swagger:swagger-jaxrs:1.5.17'
     compile 'org.liquibase:liquibase-core:3.4.2'
     compile 'org.yaml:snakeyaml:1.17'
+    compile 'org.webjars:webjars-locator-core:0.35'
+    compile 'org.webjars:swagger-ui:3.5.0'
+    compile 'org.webjars:bootstrap:3.3.7-1'
+    compile 'org.webjars:jquery:3.2.1'
+    compile 'org.webjars:angularjs:1.4.3-1'
 
     providedCompile 'javax:javaee-web-api:7.0'
-    providedCompile 'swagger-api:swagger-ui:v2.1.4:@zip'
 
     testCompile 'com.github.springtestdbunit:spring-test-dbunit:1.3.0'
     testCompile('org.dbunit:dbunit:2.5.2') {
         exclude module: 'junit'
     }
 
-}
-
-task swaggerUi(type: Copy) {
-    def zipFile = project.configurations.compile.find { it.name.startsWith("swagger-ui") }
-    def outputDir = file(swaggerUiDir)
-
-    includeEmptyDirs = false
-    from zipTree(zipFile)
-    into outputDir
-    include '**/dist/**'
-    rename('index.html', 'swagger.html')
-    eachFile { fcd -> fcd.relativePath = new RelativePath(true, fcd.relativePath.segments.tail().tail()) }
-}
-
-war {
-    dependsOn "swaggerUi"
-    from swaggerUiDir
 }
