@@ -5,6 +5,7 @@
                 <th>Created</th>
                 <th>Uploaded</th>
                 <th>Value</th>
+                <th>Consumption</th>
                 <th></th>
             </tr>
         </thead>
@@ -13,6 +14,7 @@
                 <td>{{indication.created | date}}</td>
                 <td>{{indication.uploaded | date}}</td>
                 <td>{{indication.value}}</td>
+                <td>{{indication.consumption}}</td>
                 <td>
                     <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#imageModal" ng-click="vm.onViewImageClick(indication)">
                         <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>

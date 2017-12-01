@@ -40,7 +40,6 @@ public class WebJarsFilter extends OncePerRequestFilter {
             logger.warn("Provided url is not webjar url: {}", path);
             return;
         }
-
         request.getRequestDispatcher(path).forward(request, response);
     }
 }

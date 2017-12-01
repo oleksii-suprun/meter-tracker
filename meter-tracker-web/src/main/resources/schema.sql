@@ -19,6 +19,8 @@ CREATE TABLE indication (
     meter_id BIGINT NOT NULL,
     uploaded TIMESTAMP NOT NULL,
     value DOUBLE,
+    consumption INTEGER,
+    CHECK consumption >= 0,
     FOREIGN KEY (meter_id) REFERENCES meter (id)
 );
 
