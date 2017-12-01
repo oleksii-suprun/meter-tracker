@@ -24,7 +24,6 @@ public class SwaggerFilter extends OncePerRequestFilter {
                 requestUrl.getPort(),
                 request.getContextPath(),
                 RestConfig.API_BASE_PATH);
-        String url = request.getContextPath() + "/swagger.html?url=" + swaggerJsonUrl;
-        response.sendRedirect(url);
+        response.sendRedirect(request.getContextPath() + "/webjars/swagger-ui/index.html?url=" + swaggerJsonUrl);
     }
 }
