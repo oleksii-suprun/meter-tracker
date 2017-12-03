@@ -30,21 +30,21 @@
     <INDICATION id="3" created="2015-03-20 08:12:52.000000000" hash="AF657B3B19D8541A0B476209D395662F1F18C4350891D677F7FEF184990504B7" meter_id="3" uploaded="2015-03-20 11:23:42.000000000"/>
     <INDICATION id="4" created="2015-03-20 08:13:32.000000000" hash="78BE3571F1966473AC9794908F8123B1AF3DC002169BFF01FDE4898411B50746" meter_id="2" uploaded="2015-03-20 11:24:22.000000000" value="2.084"/>
 
-    <RESOURCE id="1" data="./src/test/resources/images/cold/00000_087.jpg"/>
-    <RESOURCE id="2" data="./src/test/resources/images/cold/00000_087-m.jpg"/>
-    <RESOURCE id="3" data="./src/test/resources/images/hot/00000_102.jpg"/>
-    <RESOURCE id="4" data="./src/test/resources/images/hot/00000_102-m.jpg"/>
-    <RESOURCE id="5" data="./src/test/resources/images/hot/00001_701.jpg"/>
-    <RESOURCE id="6" data="./src/test/resources/images/hot/00001_701-m.jpg"/>
-    <RESOURCE id="7" data="./src/test/resources/images/cold/00002_084.jpg"/>
-    <RESOURCE id="8" data="./src/test/resources/images/cold/00002_084-m.jpg"/>
+    <ASSET id="1" data="./src/test/resources/images/cold/00000_087.jpg"/>
+    <ASSET id="2" data="./src/test/resources/images/cold/00000_087-m.jpg"/>
+    <ASSET id="3" data="./src/test/resources/images/hot/00000_102.jpg"/>
+    <ASSET id="4" data="./src/test/resources/images/hot/00000_102-m.jpg"/>
+    <ASSET id="5" data="./src/test/resources/images/hot/00001_701.jpg"/>
+    <ASSET id="6" data="./src/test/resources/images/hot/00001_701-m.jpg"/>
+    <ASSET id="7" data="./src/test/resources/images/cold/00002_084.jpg"/>
+    <ASSET id="8" data="./src/test/resources/images/cold/00002_084-m.jpg"/>
 
-    <RESOURCE_BINDING type="0" indication_id="1" resource_id="1"/>
-    <RESOURCE_BINDING type="1" indication_id="1" resource_id="2"/>
-    <RESOURCE_BINDING type="0" indication_id="2" resource_id="3"/>
-    <RESOURCE_BINDING type="1" indication_id="2" resource_id="4"/>
-    <RESOURCE_BINDING type="0" indication_id="3" resource_id="5"/>
-    <RESOURCE_BINDING type="1" indication_id="3" resource_id="6"/>
-    <RESOURCE_BINDING type="0" indication_id="4" resource_id="7"/>
-    <RESOURCE_BINDING type="1" indication_id="4" resource_id="8"/>
+    <INDICATION_ASSET_BINDING type="0" indication_id="1" asset_id="1"/>
+    <INDICATION_ASSET_BINDING type="1" indication_id="1" asset_id="2"/>
+    <INDICATION_ASSET_BINDING type="0" indication_id="2" asset_id="3"/>
+    <INDICATION_ASSET_BINDING type="1" indication_id="2" asset_id="4"/>
+    <INDICATION_ASSET_BINDING type="0" indication_id="3" asset_id="5"/>
+    <INDICATION_ASSET_BINDING type="1" indication_id="3" asset_id="6"/>
+    <INDICATION_ASSET_BINDING type="0" indication_id="4" asset_id="7"/>
+    <INDICATION_ASSET_BINDING type="1" indication_id="4" asset_id="8"/>
 </dataset>

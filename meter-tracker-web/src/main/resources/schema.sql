@@ -24,16 +24,16 @@ CREATE TABLE indication (
     FOREIGN KEY (meter_id) REFERENCES meter (id)
 );
 
-CREATE TABLE resource (
+CREATE TABLE asset (
     id BIGINT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     data BLOB NOT NULL
 );
 
-CREATE TABLE resource_binding (
+CREATE TABLE indication_asset_binding (
     type INTEGER NOT NULL,
     indication_id BIGINT NOT NULL,
-    resource_id BIGINT,
+    asset_id BIGINT,
     PRIMARY KEY (indication_id, type),
     FOREIGN KEY (indication_id) REFERENCES indication (id),
-    FOREIGN KEY (resource_id) REFERENCES resource (id)
+    FOREIGN KEY (asset_id) REFERENCES asset (id)
 );

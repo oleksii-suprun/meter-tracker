@@ -18,9 +18,9 @@ public class Indication {
     @Column
     private Double value;
 
-    @OneToMany(mappedBy = "resourceBindingId.indication", fetch = FetchType.EAGER, orphanRemoval = true)
-    @MapKey(name = "resourceBindingId.type")
-    private Map<ResourceBinding.Type, ResourceBinding> images;
+    @OneToMany(mappedBy = "assetBindingId.indication", fetch = FetchType.EAGER, orphanRemoval = true)
+    @MapKey(name = "assetBindingId.type")
+    private Map<AssetBinding.Type, AssetBinding> images;
 
     @Column(nullable = false, updatable = false)
     private Date uploaded;
@@ -59,11 +59,11 @@ public class Indication {
         this.value = value;
     }
 
-    public Map<ResourceBinding.Type, ResourceBinding> getImages() {
+    public Map<AssetBinding.Type, AssetBinding> getImages() {
         return images;
     }
 
-    public void setImages(Map<ResourceBinding.Type, ResourceBinding> images) {
+    public void setImages(Map<AssetBinding.Type, AssetBinding> images) {
         this.images = images;
     }
 
@@ -120,10 +120,10 @@ public class Indication {
         Indication that = (Indication) o;
 
         Set<Long> thisAssetIds = images.values().stream()
-                .map(ResourceBinding::getResource).map(Resource::getId).collect(Collectors.toSet());
+                .map(AssetBinding::getAsset).map(Asset::getId).collect(Collectors.toSet());
 
         Set<Long> thatAssetIds = that.images.values().stream()
-                .map(ResourceBinding::getResource).map(Resource::getId).collect(Collectors.toSet());
+                .map(AssetBinding::getAsset).map(Asset::getId).collect(Collectors.toSet());
 
         return id == that.id
                 && Objects.equals(value, that.value)

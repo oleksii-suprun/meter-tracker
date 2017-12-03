@@ -30,7 +30,7 @@ import java.util.*;
 
 import static com.asuprun.metertracker.core.utils.ImageUtils.bytesToImage;
 import static com.asuprun.metertracker.core.utils.ImageUtils.imageToJpgBytes;
-import static com.asuprun.metertracker.web.domain.ResourceBinding.Type.INDICATION;
+import static com.asuprun.metertracker.web.domain.AssetBinding.Type.INDICATION;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
@@ -86,15 +86,15 @@ public class IndicationService {
         indication.setHash(hash);
         indication = saveIndication(indication);
 
-        ResourceBinding bindingFull = new ResourceBinding();
-        bindingFull.setResourceBindingId(new ResourceBindingId(ResourceBinding.Type.ORIGINAL, indication));
-        bindingFull.setResource(resourceRepository.save(new Resource(bytes)));
+        AssetBinding bindingFull = new AssetBinding();
+        bindingFull.setAssetBindingId(new AssetBindingId(AssetBinding.Type.ORIGINAL, indication));
+        bindingFull.setAsset(resourceRepository.save(new Asset(bytes)));
 
-        ResourceBinding bindingIndication = new ResourceBinding();
+        AssetBinding bindingIndication = new AssetBinding();
         try {
             bytes = imageToJpgBytes(extractor.extractIndicationRegion(bytesToImage(bytes)));
-            bindingIndication.setResourceBindingId(new ResourceBindingId(INDICATION, indication));
-            bindingIndication.setResource(resourceRepository.save(new Resource(bytes)));
+            bindingIndication.setAssetBindingId(new AssetBindingId(INDICATION, indication));
+            bindingIndication.setAsset(resourceRepository.save(new Asset(bytes)));
         } catch (BorderNotFoundException e) {
             logger.warn("Cannot detect indication borders.", e);
             throw new IllegalArgumentException("Cannot detect indication region.");
@@ -103,7 +103,7 @@ public class IndicationService {
             throw new IllegalArgumentException("Bad image file provided.");
         }
 
-        indication.getImages().put(ResourceBinding.Type.ORIGINAL, resourceBindingRepository.save(bindingFull));
+        indication.getImages().put(AssetBinding.Type.ORIGINAL, resourceBindingRepository.save(bindingFull));
         indication.getImages().put(INDICATION, resourceBindingRepository.save(bindingIndication));
         return indication;
     }
@@ -173,7 +173,7 @@ public class IndicationService {
             logger.debug("Cannot recognize not existing indication with id: {}", indicationId);
             return new NoSuchElementException("No such indication");
         });
-        BufferedImage extracted = bytesToImage(indication.getImages().get(INDICATION).getResource().getData());
+        BufferedImage extracted = bytesToImage(indication.getImages().get(INDICATION).getAsset().getData());
         return extractor.extractDigits(extracted, indication.getMeter().getCapacity()).stream()
                 .map(i -> new Digit(ImageUtils.imageToJpgBytes(i), recognizer.isTrained()
                         ? recognizer.recognize(i).orElse(null)

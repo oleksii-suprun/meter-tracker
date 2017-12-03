@@ -8,7 +8,7 @@ import java.util.Objects;
 
 @SuppressWarnings("unused")
 @Entity
-public class Resource {
+public class Asset {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,10 +19,10 @@ public class Resource {
     @Column(nullable = false, updatable = false)
     private byte[] data;
 
-    public Resource() {
+    public Asset() {
     }
 
-    public Resource(byte[] data) {
+    public Asset(byte[] data) {
         this.data = data;
     }
 
@@ -52,7 +52,7 @@ public class Resource {
             return false;
         }
 
-        Resource resource = (Resource) o;
+        Asset resource = (Asset) o;
         return id == resource.id && Arrays.equals(data, resource.data);
     }
 

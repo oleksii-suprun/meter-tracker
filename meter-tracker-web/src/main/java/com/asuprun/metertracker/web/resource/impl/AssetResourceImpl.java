@@ -1,14 +1,14 @@
 package com.asuprun.metertracker.web.resource.impl;
 
 import com.asuprun.metertracker.web.repository.ResourceRepository;
-import com.asuprun.metertracker.web.resource.ImageResource;
+import com.asuprun.metertracker.web.resource.AssetResource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.core.Response;
 
 @Component
-public class ImageResourceImpl implements ImageResource {
+public class AssetResourceImpl implements AssetResource {
 
     @Autowired
     private ResourceRepository resourceRepository;

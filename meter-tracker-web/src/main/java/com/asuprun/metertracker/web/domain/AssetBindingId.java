@@ -1,15 +1,12 @@
 package com.asuprun.metertracker.web.domain;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Objects;
 
 @SuppressWarnings("unused")
 @Embeddable
-public class ResourceBindingId implements Serializable {
+public class AssetBindingId implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "indication_id")
@@ -17,12 +14,12 @@ public class ResourceBindingId implements Serializable {
 
     @Column
     @Enumerated
-    private ResourceBinding.Type type;
+    private AssetBinding.Type type;
 
-    public ResourceBindingId() {
+    public AssetBindingId() {
     }
 
-    public ResourceBindingId(ResourceBinding.Type type, Indication indication) {
+    public AssetBindingId(AssetBinding.Type type, Indication indication) {
         this.type = type;
         this.indication = indication;
     }
@@ -35,11 +32,11 @@ public class ResourceBindingId implements Serializable {
         this.indication = indication;
     }
 
-    public ResourceBinding.Type getType() {
+    public AssetBinding.Type getType() {
         return type;
     }
 
-    public void setType(ResourceBinding.Type type) {
+    public void setType(AssetBinding.Type type) {
         this.type = type;
     }
 
@@ -52,7 +49,7 @@ public class ResourceBindingId implements Serializable {
             return false;
         }
 
-        ResourceBindingId that = (ResourceBindingId) o;
+        AssetBindingId that = (AssetBindingId) o;
         return indication.getId() == that.indication.getId() && type == that.type;
     }
 
