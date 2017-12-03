@@ -1,6 +1,8 @@
 package com.asuprun.metertracker.web.domain;
 
 import javax.persistence.*;
+import java.util.Arrays;
+import java.util.Objects;
 
 @Entity
 public class Digit {
@@ -46,5 +48,26 @@ public class Digit {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Digit digit = (Digit) o;
+        return id == digit.id
+                && Arrays.equals(image, digit.image)
+                && Objects.equals(value, digit.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, image, value);
     }
 }
