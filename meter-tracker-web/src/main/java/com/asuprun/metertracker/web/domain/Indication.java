@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 @Entity
@@ -17,9 +18,9 @@ public class Indication {
     @Column
     private Double value;
 
-    @OneToMany(mappedBy = "resourceBindingId.indication", fetch = FetchType.EAGER, orphanRemoval = true)
-    @MapKey(name = "resourceBindingId.type")
-    private Map<ResourceBinding.Type, ResourceBinding> images;
+    @OneToMany(mappedBy = "assetBindingId.indication", fetch = FetchType.EAGER, orphanRemoval = true)
+    @MapKey(name = "assetBindingId.type")
+    private Map<AssetBinding.Type, AssetBinding> images;
 
     @Column(nullable = false, updatable = false)
     private Date uploaded;
@@ -58,11 +59,11 @@ public class Indication {
         this.value = value;
     }
 
-    public Map<ResourceBinding.Type, ResourceBinding> getImages() {
+    public Map<AssetBinding.Type, AssetBinding> getImages() {
         return images;
     }
 
-    public void setImages(Map<ResourceBinding.Type, ResourceBinding> images) {
+    public void setImages(Map<AssetBinding.Type, AssetBinding> images) {
         this.images = images;
     }
 
@@ -104,5 +105,38 @@ public class Indication {
 
     public void setConsumption(Integer consumption) {
         this.consumption = consumption;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Indication that = (Indication) o;
+
+        Set<Long> thisAssetIds = images.values().stream()
+                .map(AssetBinding::getAsset).map(Asset::getId).collect(Collectors.toSet());
+
+        Set<Long> thatAssetIds = that.images.values().stream()
+                .map(AssetBinding::getAsset).map(Asset::getId).collect(Collectors.toSet());
+
+        return id == that.id
+                && Objects.equals(value, that.value)
+                && Objects.equals(thisAssetIds, thatAssetIds)
+                && Objects.equals(uploaded, that.uploaded)
+                && Objects.equals(created, that.created)
+                && Objects.equals(meter, that.meter)
+                && Objects.equals(hash, that.hash)
+                && Objects.equals(consumption, that.consumption);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, value, images, uploaded, created, meter, hash, consumption);
     }
 }

@@ -1,6 +1,7 @@
 package com.asuprun.metertracker.web.domain;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @SuppressWarnings("unused")
 @Entity
@@ -49,5 +50,27 @@ public class Meter {
 
     public void setCapacity(int capacity) {
         this.capacity = capacity;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Meter meter = (Meter) o;
+        return id == meter.id
+                && capacity == meter.capacity
+                && minorDigits == meter.minorDigits
+                && Objects.equals(name, meter.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, capacity, minorDigits);
     }
 }

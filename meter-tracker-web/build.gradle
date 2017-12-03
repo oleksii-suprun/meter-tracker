@@ -21,12 +21,14 @@ dependencies {
     compile 'org.liquibase:liquibase-core:3.4.2'
     compile 'org.yaml:snakeyaml:1.17'
     compile 'org.webjars:webjars-locator-core:0.35'
-    compile 'org.webjars:swagger-ui:3.5.0'
-    compile 'org.webjars:bootstrap:3.3.7-1'
-    compile 'org.webjars:jquery:3.2.1'
-    compile 'org.webjars:angularjs:1.4.3-1'
 
     providedCompile 'javax:javaee-web-api:7.0'
+
+    runtime 'com.mattbertolini:liquibase-slf4j:2.0.0'
+    runtime 'org.webjars:swagger-ui:3.5.0'
+    runtime 'org.webjars:bootstrap:3.3.7-1'
+    runtime 'org.webjars:jquery:3.2.1'
+    runtime 'org.webjars:angularjs:1.4.3-1'
 
     testCompile 'com.github.springtestdbunit:spring-test-dbunit:1.3.0'
     testCompile 'org.mockito:mockito-core:2.12.0'

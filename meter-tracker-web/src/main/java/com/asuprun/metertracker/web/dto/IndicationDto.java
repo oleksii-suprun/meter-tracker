@@ -1,7 +1,7 @@
 package com.asuprun.metertracker.web.dto;
 
 import com.asuprun.metertracker.web.domain.Indication;
-import com.asuprun.metertracker.web.domain.ResourceBinding;
+import com.asuprun.metertracker.web.domain.AssetBinding;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -94,8 +94,8 @@ public class IndicationDto {
         IndicationDto dto = new IndicationDto();
         dto.id = indication.getId();
         dto.value = indication.getValue();
-        dto.originalImageId = indication.getImages().get(ResourceBinding.Type.ORIGINAL).getResource().getId();
-        dto.indicationImageId = indication.getImages().get(ResourceBinding.Type.INDICATION).getResource().getId();
+        dto.originalImageId = indication.getImages().get(AssetBinding.Type.ORIGINAL).getAsset().getId();
+        dto.indicationImageId = indication.getImages().get(AssetBinding.Type.INDICATION).getAsset().getId();
         dto.uploaded = indication.getUploaded();
         dto.created = indication.getCreated();
         dto.meterName = indication.getMeter().getName();

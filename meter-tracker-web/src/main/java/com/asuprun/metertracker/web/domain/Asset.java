@@ -3,10 +3,12 @@ package com.asuprun.metertracker.web.domain;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.Arrays;
+import java.util.Objects;
 
 @SuppressWarnings("unused")
 @Entity
-public class Resource {
+public class Asset {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,10 +19,10 @@ public class Resource {
     @Column(nullable = false, updatable = false)
     private byte[] data;
 
-    public Resource() {
+    public Asset() {
     }
 
-    public Resource(byte[] data) {
+    public Asset(byte[] data) {
         this.data = data;
     }
 
@@ -38,5 +40,24 @@ public class Resource {
 
     public void setData(byte[] data) {
         this.data = data;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Asset resource = (Asset) o;
+        return id == resource.id && Arrays.equals(data, resource.data);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, data);
     }
 }
