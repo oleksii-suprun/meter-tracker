@@ -3,9 +3,12 @@ package com.asuprun.metertracker.web.service;
 import com.asuprun.metertracker.web.domain.Digit;
 import com.asuprun.metertracker.web.domain.Indication;
 import com.asuprun.metertracker.web.domain.Meter;
-import com.asuprun.metertracker.web.repository.*;
+import com.asuprun.metertracker.web.repository.DigitRepository;
+import com.asuprun.metertracker.web.repository.IndicationRepository;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -14,12 +17,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class IndicationServiceTest {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @InjectMocks
     private IndicationService indicationService;
@@ -157,5 +163,147 @@ public class IndicationServiceTest {
         verify(indicationRepository).findRecognizedAfter(eq(meter.getId()), eq(indication.getCreated()));
         verify(indicationRepository).save(same(indication));
         verify(digitRepository).findAll();
+    }
+
+    @Test
+    public void testUpdateIndicationWithZeroConsumptionShouldPass() {
+        Meter meter = new Meter();
+        meter.setId(1);
+        meter.setCapacity(8);
+        meter.setMinorDigits(3);
+
+        Indication indication = new Indication();
+        indication.setId(1);
+        indication.setMeter(meter);
+        indication.setCreated(new Date());
+        indication.setValue(59.942);
+        indication.setConsumption(0);
+
+        Indication updated = new Indication();
+        updated.setId(1);
+        updated.setValue(30.635);
+
+        when(indicationRepository.findById(updated.getId())).thenReturn(Optional.of(indication));
+        when(indicationRepository.save(indication)).thenReturn(indication);
+
+        indicationService.update(updated);
+        assertEquals(1, indication.getId());
+        assertEquals(30.635, indication.getValue(), 1e-6);
+        assertEquals(0, indication.getConsumption().intValue());
+
+        verify(indicationRepository).findById(updated.getId());
+        verify(indicationRepository).save(indication);
+    }
+
+    @Test
+    public void testUpdateIndicationShouldUpdateCurrentConsumption() {
+        Meter meter = new Meter();
+        meter.setId(1);
+        meter.setCapacity(8);
+        meter.setMinorDigits(3);
+
+        Indication firstIndication = new Indication();
+        firstIndication.setId(1);
+        firstIndication.setMeter(meter);
+        firstIndication.setCreated(new Date());
+        firstIndication.setValue(59.942);
+        firstIndication.setConsumption(0);
+
+        Indication secondIndication = new Indication();
+        secondIndication.setId(2);
+        secondIndication.setMeter(meter);
+        secondIndication.setCreated(new Date());
+        secondIndication.setValue(62.752);
+        secondIndication.setConsumption(3);
+
+        Indication updated = new Indication();
+        updated.setId(2);
+        updated.setValue(64.635);
+
+        when(indicationRepository.findById(updated.getId())).thenReturn(Optional.of(secondIndication));
+        when(indicationRepository.save(secondIndication)).thenReturn(secondIndication);
+        when(indicationRepository.findRecognizedAfter(
+                secondIndication.getMeter().getId(),
+                secondIndication.getCreated())).thenReturn(Optional.empty());
+        when(indicationRepository.findRecognizedBefore(
+                secondIndication.getMeter().getId(),
+                secondIndication.getCreated())).thenReturn(Optional.of(firstIndication));
+
+        indicationService.update(updated);
+        assertEquals(64.635, secondIndication.getValue(), 1e-6);
+        assertEquals(5, secondIndication.getConsumption().intValue());
+
+        verify(indicationRepository).findById(updated.getId());
+        verify(indicationRepository).save(secondIndication);
+    }
+
+    @Test
+    public void testUpdateIndicationShouldUpdateCurrentAndNextConsumption() {
+        Meter meter = new Meter();
+        meter.setId(1);
+        meter.setCapacity(8);
+        meter.setMinorDigits(3);
+
+        Indication firstIndication = new Indication();
+        firstIndication.setId(1);
+        firstIndication.setMeter(meter);
+        firstIndication.setCreated(new Date());
+        firstIndication.setValue(59.942);
+        firstIndication.setConsumption(0);
+
+        Indication secondIndication = new Indication();
+        secondIndication.setId(2);
+        secondIndication.setMeter(meter);
+        secondIndication.setCreated(new Date());
+        secondIndication.setValue(62.752);
+        secondIndication.setConsumption(3);
+
+        Indication thirdIndication = new Indication();
+        thirdIndication.setId(3);
+        thirdIndication.setMeter(meter);
+        thirdIndication.setCreated(new Date());
+        thirdIndication.setValue(68.103);
+        thirdIndication.setConsumption(6);
+
+        Indication updated = new Indication();
+        updated.setId(2);
+        updated.setValue(64.635);
+
+        when(indicationRepository.findById(updated.getId())).thenReturn(Optional.of(secondIndication));
+        when(indicationRepository.save(secondIndication)).thenReturn(secondIndication);
+        when(indicationRepository.save(thirdIndication)).thenReturn(thirdIndication);
+        when(indicationRepository.findRecognizedAfter(
+                secondIndication.getMeter().getId(),
+                secondIndication.getCreated())).thenReturn(Optional.of(thirdIndication));
+        when(indicationRepository.findRecognizedBefore(
+                secondIndication.getMeter().getId(),
+                secondIndication.getCreated())).thenReturn(Optional.of(firstIndication));
+
+        indicationService.update(updated);
+        assertEquals(64.635, secondIndication.getValue(), 1e-6);
+        assertEquals(5, secondIndication.getConsumption().intValue());
+        assertEquals(68.103, thirdIndication.getValue(), 1e-6);
+        assertEquals(4, thirdIndication.getConsumption().intValue());
+
+        verify(indicationRepository).findById(updated.getId());
+        verify(indicationRepository).save(secondIndication);
+        verify(indicationRepository).save(thirdIndication);
+    }
+
+    @Test
+    public void testUpdateIndicationShouldThrowNoSuchElementException() {
+        expectedException.expect(NoSuchElementException.class);
+        expectedException.expectMessage("No such indication");
+
+        Indication updated = new Indication();
+        updated.setId(1);
+        updated.setValue(30.635);
+
+        when(indicationRepository.findById(updated.getId())).thenReturn(Optional.empty());
+
+        indicationService.update(updated);
+
+        verify(indicationRepository).findById(updated.getId());
+        verify(indicationRepository, never()).save(any(Indication.class));
     }
 }

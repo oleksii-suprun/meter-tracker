@@ -14,6 +14,9 @@
                 method: "POST",
                 transformRequest: angular.identity,
                 headers: {'Content-Type': undefined}
+            },
+            update: {
+                method: "PUT"
             }
         });
     }

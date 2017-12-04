@@ -8,6 +8,7 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -28,7 +29,7 @@ public interface IndicationResource {
     List<IndicationDto> get(@QueryParam(PARAM_METER_ID) @ApiParam("Meter id") Long meterId,
                             @QueryParam(PARAM_UNRECOGNIZED)
                             @ApiParam(value = "If specified, method returns only recognized or not recognized indications")
-                            Boolean unrecognized);
+                                    Boolean unrecognized);
 
     @GET
     @Path("/{id}")
@@ -46,6 +47,19 @@ public interface IndicationResource {
             @ApiResponse(code = 404, message = "No such indication", response = ErrorResponse.class)
     })
     Response delete(@PathParam("id") @ApiParam("Target indication id") long id);
+
+    @PUT
+    @Path("/{id}")
+    @ApiOperation(value = "Updates indication by ID")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Indication successfully updated"),
+            @ApiResponse(code = 404, message = "No such indication", response = ErrorResponse.class),
+            @ApiResponse(code = 400, message = "Value must be positive", response = ErrorResponse.class),
+            @ApiResponse(code = 400, message = "No indication data provided", response = ErrorResponse.class)
+    })
+    Response update(@PathParam("id") @ApiParam("Target indication id") long id,
+                    @ApiParam("Modified indication") @Valid IndicationDto indicationDto);
+
 
     @GET
     @Path("/{id}/digits")
