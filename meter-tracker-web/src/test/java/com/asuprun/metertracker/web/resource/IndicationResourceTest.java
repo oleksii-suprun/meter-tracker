@@ -469,7 +469,7 @@ public class IndicationResourceTest {
 
         ErrorResponse errorResponse = TestUtils.readErrorResponseEntity(response);
         assertNotNull(errorResponse);
-        assertEquals("Value must be positive", errorResponse.getMessage());
+        assertEquals("Value must be greater or equals to 0", errorResponse.getMessage());
     }
 
     @Test

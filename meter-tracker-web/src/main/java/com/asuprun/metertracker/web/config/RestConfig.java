@@ -3,10 +3,12 @@ package com.asuprun.metertracker.web.config;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.models.Info;
-import org.apache.cxf.feature.Feature;
-import org.apache.cxf.feature.LoggingFeature;
+import org.apache.cxf.Bus;
+import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.ext.logging.LoggingFeature;
+import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.spring.SpringComponentScanServer;
+import org.apache.cxf.jaxrs.spring.JaxRsConfig;
 import org.apache.cxf.jaxrs.validation.JAXRSBeanValidationFeature;
 import org.apache.cxf.transport.local.LocalConduit;
 import org.apache.cxf.transport.servlet.CXFServlet;
@@ -18,8 +20,9 @@ import org.springframework.context.annotation.*;
 import javax.servlet.annotation.WebServlet;
 import javax.ws.rs.Path;
 import javax.ws.rs.ext.Provider;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collections;
 import java.util.stream.Stream;
 
 @Configuration
@@ -30,13 +33,29 @@ import java.util.stream.Stream;
         },
         includeFilters = @ComponentScan.Filter({Path.class, Provider.class})
 )
-public class RestConfig extends SpringComponentScanServer {
+public class RestConfig extends JaxRsConfig {
 
     public static final String API_BASE_PATH = "rs";
-    public static final String LOCAL_TRANSPORT_PATH = "local://" + API_BASE_PATH;
+
+    private final ApplicationContext applicationContext;
 
     @Autowired
-    private ApplicationContext applicationContext;
+    public RestConfig(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
+
+    @Bean
+    public Server jaxRsServer(Bus bus) {
+        JAXRSServerFactoryBean factory = new JAXRSServerFactoryBean();
+        factory.setAddress(getAddress());
+        factory.setBus(bus);
+        factory.setServiceBeans(new ArrayList<>(applicationContext.getBeansWithAnnotation(Path.class).values()));
+        factory.setProviders(new ArrayList<>(applicationContext.getBeansWithAnnotation(Provider.class).values()));
+        factory.setFeatures(Arrays.asList(
+                new LoggingFeature(),
+                new JAXRSBeanValidationFeature()));
+        return factory.create();
+    }
 
     @Bean
     @Profile(ApplicationConfig.Profiles.NOT_TEST)
@@ -54,30 +73,20 @@ public class RestConfig extends SpringComponentScanServer {
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     @Profile(ApplicationConfig.Profiles.TEST)
     public WebClient webClient() {
-        WebClient client = WebClient.create(getAddress(), getJaxrsProviders());
+        WebClient client = WebClient.create(getAddress(), Collections.singletonList(jacksonJsonProvider()));
         WebClient.getConfig(client).getRequestContext().put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
         return client;
     }
 
-    @Override
-    public List<Feature> getFeatures() {
-        return Arrays.asList(
-                new LoggingFeature(),
-                new JAXRSBeanValidationFeature());
+    @Bean
+    public JacksonJsonProvider jacksonJsonProvider() {
+        return new JacksonJsonProvider();
     }
 
-    @Override
-    protected List<Object> getJaxrsProviders() {
-        List<Object> providers = super.getJaxrsProviders();
-        providers.add(new JacksonJsonProvider());
-        return providers;
-    }
-
-    @Override
-    protected String getAddress() {
+    private String getAddress() {
         return Stream.of(applicationContext.getEnvironment().getActiveProfiles()).anyMatch(p -> p.equals("test"))
-                ? LOCAL_TRANSPORT_PATH
-                : super.getAddress();
+                ? "local://" + API_BASE_PATH
+                : "/";
     }
 
     @WebServlet("/" + API_BASE_PATH + "/*")

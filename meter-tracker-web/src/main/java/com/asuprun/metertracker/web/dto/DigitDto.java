@@ -1,8 +1,8 @@
 package com.asuprun.metertracker.web.dto;
 
 import com.asuprun.metertracker.web.domain.Digit;
-import org.hibernate.validator.constraints.NotEmpty;
 
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 import java.util.stream.Collectors;
 

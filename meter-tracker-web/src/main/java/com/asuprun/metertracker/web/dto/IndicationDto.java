@@ -5,8 +5,8 @@ import com.asuprun.metertracker.web.domain.Indication;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +20,7 @@ public class IndicationDto {
     private long id;
 
     @NotNull
-    @DecimalMin(value = "0.0", message = "Value must be positive")
+    @PositiveOrZero(message = "Value must be greater or equals to 0")
     private Double value;
     private long originalImageId;
     private long indicationImageId;
