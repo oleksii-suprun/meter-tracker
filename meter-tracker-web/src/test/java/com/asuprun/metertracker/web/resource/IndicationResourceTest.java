@@ -399,4 +399,87 @@ public class IndicationResourceTest {
         assertEquals(01234.567, indication.get().getValue(), 1e-6);
         assertEquals(1234, indication.get().getConsumption().intValue());
     }
+
+    @Test
+    @DirtiesContext
+    public void testIndicationValueUpdate() {
+        IndicationDto dto = IndicationDto.builder()
+                .withId(4)
+                .withValue(3.326)
+                .build();
+
+        client.path(dto.getId());
+        Response response = client.put(dto);
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+        Optional<Indication> indication = indicationService.findById(dto.getId());
+        assertTrue(indication.isPresent());
+        assertEquals(3.326, indication.get().getValue(), 1e-6);
+        assertEquals(3, indication.get().getConsumption().intValue());
+    }
+
+    @Test
+    @DirtiesContext
+    public void testIndicationValueUpdateWithSubsequent() {
+        IndicationDto dto = IndicationDto.builder()
+                .withId(1)
+                .withValue(1.743)
+                .build();
+
+        client.path(dto.getId());
+        Response response = client.put(dto);
+        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+
+        Optional<Indication> indication = indicationService.findById(dto.getId());
+        assertTrue(indication.isPresent());
+        assertEquals(1.743, indication.get().getValue(), 1e-6);
+        assertEquals(0, indication.get().getConsumption().intValue());
+
+        Optional<Indication> nextIndication = indicationService.findById(4);
+        assertTrue(nextIndication.isPresent());
+        assertEquals(2.084, nextIndication.get().getValue(), 1e-6);
+        assertEquals(1, nextIndication.get().getConsumption().intValue());
+    }
+
+    @Test
+    public void testIndicationValueUpdateNotFound() {
+        IndicationDto dto = IndicationDto.builder()
+                .withId(Long.MAX_VALUE)
+                .build();
+
+        client.path(dto.getId());
+        Response response = client.put(dto);
+        assertEquals(Response.Status.NOT_FOUND.getStatusCode(), response.getStatus());
+
+        ErrorResponse errorResponse = TestUtils.readErrorResponseEntity(response);
+        assertNotNull(errorResponse);
+        assertEquals("No such indication", errorResponse.getMessage());
+    }
+
+    @Test
+    public void testIndicationValueUpdateBadRequestNegativeValue() {
+        IndicationDto dto = IndicationDto.builder()
+                .withId(1)
+                .withValue(-1)
+                .build();
+
+        client.path(dto.getId());
+        Response response = client.put(dto);
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+
+        ErrorResponse errorResponse = TestUtils.readErrorResponseEntity(response);
+        assertNotNull(errorResponse);
+        assertEquals("Value must be positive", errorResponse.getMessage());
+    }
+
+    @Test
+    public void testIndicationValueUpdateBadRequestIndicationNotProvided() {
+        client.path(1);
+        Response response = client.put(null);
+        assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+
+        ErrorResponse errorResponse = TestUtils.readErrorResponseEntity(response);
+        assertNotNull(errorResponse);
+        assertEquals("No indication data provided", errorResponse.getMessage());
+    }
 }

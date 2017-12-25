@@ -1,12 +1,15 @@
 package com.asuprun.metertracker.web.dto;
 
-import com.asuprun.metertracker.web.domain.Indication;
 import com.asuprun.metertracker.web.domain.AssetBinding;
+import com.asuprun.metertracker.web.domain.Indication;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
@@ -15,6 +18,9 @@ import java.util.stream.Collectors;
 public class IndicationDto {
 
     private long id;
+
+    @NotNull
+    @DecimalMin(value = "0.0", message = "Value must be positive")
     private Double value;
     private long originalImageId;
     private long indicationImageId;
@@ -103,7 +109,46 @@ public class IndicationDto {
         return dto;
     }
 
+    public static Optional<Indication> fromDto(IndicationDto dto) {
+        return Optional.ofNullable(dto).map(d -> {
+            Indication indication = new Indication();
+            indication.setId(d.id);
+            indication.setValue(d.value);
+            indication.setUploaded(d.uploaded);
+            indication.setCreated(d.created);
+            indication.setConsumption(d.consumption);
+            return indication;
+        });
+    }
+
     public static List<IndicationDto> toDtos(List<Indication> indications) {
         return indications.stream().map(IndicationDto::toDto).collect(Collectors.toList());
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+
+        private long id;
+        private double value;
+
+        public Builder withId(long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder withValue(double value) {
+            this.value = value;
+            return this;
+        }
+
+        public IndicationDto build() {
+            IndicationDto dto = new IndicationDto();
+            dto.setId(id);
+            dto.setValue(value);
+            return dto;
+        }
     }
 }

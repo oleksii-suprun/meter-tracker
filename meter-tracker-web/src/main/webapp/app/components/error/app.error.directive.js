@@ -39,7 +39,7 @@
                 if (!newValue.hasOwnProperty(key)) {
                     continue;
                 }
-                if ((vm.appError != 'local' && !newValue[key].local) || (vm.appError === 'local' && newValue[key].local)) {
+                if ((vm.appError !== 'local' && !newValue[key].local) || (vm.appError === 'local' && newValue[key].local)) {
                     vm.messages[key] = newValue[key].message;
                 }
             }

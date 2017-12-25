@@ -11,16 +11,38 @@
     function IndicationListController($location, indicationService, errorMessageService) {
         var vm = this;
         vm.indications = [];
-        vm.selectedIndication = null;
+        vm.indicationPreview = {};
+        vm.selectedIndication = {};
 
         init();
 
-        this.onViewImageClick = function(indication) {
-            vm.selectedIndication = indication;
+        this.onViewImageClick = function (indication) {
+            vm.indicationPreview.created = indication.created;
+            vm.indicationPreview.imageId = indication.originalImageId;
+        };
+
+        this.onEditClick = function (indication) {
+            vm.selectedIndication = angular.copy(indication)
+        };
+
+        this.updateSelectedIndication = function () {
+            indicationService.update({
+                id: vm.selectedIndication.id
+            }, vm.selectedIndication, function () {
+                init();
+                $('#editModal').modal('hide')
+            }, function (error) {
+                errorMessageService.add('app.indication.list.controller.INDICATIONS_UPDATE_ERROR', error.data.message, true)
+            });
+        };
+
+        this.onUpdateCancelClick = function () {
+            errorMessageService.remove('app.indication.list.controller.INDICATIONS_UPDATE_ERROR');
         };
 
         function init() {
             errorMessageService.remove('app.indication.list.controller.INDICATIONS_LOAD_ERROR');
+            errorMessageService.remove('app.indication.list.controller.INDICATIONS_UPDATE_ERROR');
 
             indicationService.query({meterId: $location.search().meter, unrecognized: false}, function (result) {
                 vm.indications = result;

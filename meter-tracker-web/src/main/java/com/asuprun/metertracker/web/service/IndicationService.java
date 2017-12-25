@@ -168,6 +168,23 @@ public class IndicationService {
         indicationRepository.delete(id);
     }
 
+    @Transactional
+    public void update(Indication indication) {
+        Indication persisted = indicationRepository.findById(indication.getId()).orElseThrow(() -> {
+            logger.debug("Cannot delete not existing indication with id: {}", indication.getId());
+            return new NoSuchElementException("No such indication");
+        });
+
+        // only value and consumption can be updated
+        persisted.setValue(indication.getValue());
+        persisted.setConsumption(calculateConsumption(
+                persisted.getMeter().getId(),
+                persisted.getCreated(),
+                persisted.getValue()));
+
+        indicationRepository.save(persisted);
+    }
+
     public List<Digit> recognize(long indicationId) {
         Indication indication = findById(indicationId).orElseThrow(() -> {
             logger.debug("Cannot recognize not existing indication with id: {}", indicationId);
@@ -203,6 +220,7 @@ public class IndicationService {
     }
 
     private int calculateConsumption(long meterId, Date created, double value) {
+        // update subsequent indication if present
         indicationRepository.findRecognizedAfter(meterId, created).ifPresent(i -> {
             i.setConsumption((int) Math.floor(i.getValue()) - ((int) value));
             indicationRepository.save(i);

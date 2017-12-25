@@ -21,8 +21,12 @@ public class IndicationResourceImpl implements IndicationResource {
 
     private static Logger logger = LoggerFactory.getLogger(IndicationResource.class);
 
-    @Autowired
     private IndicationService indicationService;
+
+    @Autowired
+    public IndicationResourceImpl(IndicationService indicationService) {
+        this.indicationService = indicationService;
+    }
 
     @Override
     public List<IndicationDto> get(Long meterId, Boolean unrecognized) {
@@ -43,6 +47,18 @@ public class IndicationResourceImpl implements IndicationResource {
     public Response delete(long id) {
         indicationService.delete(id);
         return Response.noContent().build();
+    }
+
+    @Override
+    public Response update(long id, IndicationDto indicationDto) {
+        return IndicationDto.fromDto(indicationDto).map(i -> {
+            i.setId(id); // use id from path
+            indicationService.update(i);
+            return Response.ok().build();
+        }).orElseThrow(() -> {
+            logger.debug("No indication data provided: id={}", id);
+            return new IllegalArgumentException("No indication data provided");
+        });
     }
 
     @Override
