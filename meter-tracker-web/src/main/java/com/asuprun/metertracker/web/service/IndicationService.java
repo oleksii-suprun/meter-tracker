@@ -161,11 +161,11 @@ public class IndicationService {
     }
 
     public void delete(long id) {
-        if (!indicationRepository.exists(id)) {
+        if (!indicationRepository.existsById(id)) {
             logger.debug("Cannot delete not existing indication with id: {}", id);
             throw new NoSuchElementException("No such indication");
         }
-        indicationRepository.delete(id);
+        indicationRepository.deleteById(id);
     }
 
     @Transactional
