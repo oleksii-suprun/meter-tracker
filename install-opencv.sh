@@ -2,7 +2,7 @@
 
 set -e
 
-OPENCV_VERSION=3.3.1
+OPENCV_VERSION=3.4.1
 
 if [[ -d "$OPENCV_JAVA_PATH" && "$(ls -A $OPENCV_JAVA_PATH)" ]]; then
     echo "OpenCV already installed. Installation will be skipped."
@@ -10,11 +10,18 @@ if [[ -d "$OPENCV_JAVA_PATH" && "$(ls -A $OPENCV_JAVA_PATH)" ]]; then
 fi
 
 echo "OpenCV-$OPENCV_JAVA_PATH is being installed..."
-git clone git://github.com/Itseez/opencv.git --branch $OPENCV_VERSION --depth=1
+git clone https://github.com/opencv/opencv.git --branch $OPENCV_VERSION --depth=1
 cd opencv
 mkdir build
 cd build
-cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=$OPENCV_HOME ..
-make -j4
+cmake \
+    -D BUILD_SHARED_LIBS=OFF \
+    -D BUILD_EXAMPLES=OFF \
+    -D BUILD_TESTS=OFF \
+    -D BUILD_PERF_TESTS=OFF \
+    -D CMAKE_BUILD_TYPE=RELEASE \
+    -D CMAKE_INSTALL_PREFIX=$OPENCV_HOME \
+    ..
+make -j$(nproc)
 make install
 cd ../..
