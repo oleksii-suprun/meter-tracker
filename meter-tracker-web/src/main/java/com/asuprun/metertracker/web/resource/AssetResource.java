@@ -22,5 +22,5 @@ public interface AssetResource {
             @ApiResponse(code = 200, message = "Image is found"),
             @ApiResponse(code = 404, message = "Image not found")
     })
-    Response getImage(@PathParam("id") @ApiParam("Target image id") String id);
+    Response getImage(@PathParam("id") @ApiParam("Target image id") long id);
 }
