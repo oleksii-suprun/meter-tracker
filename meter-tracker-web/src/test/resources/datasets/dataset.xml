@@ -25,14 +25,14 @@
     <DIGIT id="24" image="./src/test/resources/images/digits/8/2.jpg" value="8"/>
     <DIGIT id="25" image="./src/test/resources/images/digits/9/1.jpg" value="9"/>
 
-    <IMAGE_INFO id="1" storage_id="dfc751b80bec8aa64c41e512745c1e64" hash="dfc751b80bec8aa64c41e512745c1e64" uploaded_at="2015-02-20 10:12:00.000000000" created_at="2015-02-20 09:12:34.000000000" file_name="00000_087.jpg"/>
-    <IMAGE_INFO id="2" storage_id="127a2ab163a0673859e1c14f0d12e5a5" uploaded_at="2015-02-20 10:12:00.000000000" file_name="i_00000_087.jpg"/>
-    <IMAGE_INFO id="3" storage_id="2d320c230cb9e294aa9d78cb6b1af147" hash="2d320c230cb9e294aa9d78cb6b1af147" uploaded_at="2015-02-20 10:12:34.000000000" created_at="2015-02-20 09:13:21.000000000" file_name="00000_102.jpg"/>
-    <IMAGE_INFO id="4" storage_id="566d9d151013bb21f9b77feb58741c98" uploaded_at="2015-02-20 10:12:34.000000000" file_name="i_00000_102.jpg"/>
-    <IMAGE_INFO id="5" storage_id="a39442561f89a80761f42703d9a14534" hash="a39442561f89a80761f42703d9a14534" uploaded_at="2015-03-20 11:23:42.000000000" created_at="2015-03-20 08:12:52.000000000" file_name="00001_701.jpg"/>
-    <IMAGE_INFO id="6" storage_id="59da3ab2ff216d80a1115fa20a63303c" uploaded_at="2015-03-20 11:23:42.000000000" file_name="i_00001_701.jpg"/>
-    <IMAGE_INFO id="7" storage_id="5b691838047e3ebb8734e03406acfe16" hash="5b691838047e3ebb8734e03406acfe16" uploaded_at="2015-03-20 11:24:22.000000000" created_at="2015-03-20 08:13:32.000000000" file_name="00002_084.jpg"/>
-    <IMAGE_INFO id="8" storage_id="48a353ac6e0fd41da118777a73eeb99c" uploaded_at="2015-03-20 11:24:22.000000000" file_name="i_00002_084.jpg"/>
+    <IMAGE_INFO id="1" url="files?id=dfc751b80bec8aa64c41e512745c1e64" storage_id="dfc751b80bec8aa64c41e512745c1e64" hash="dfc751b80bec8aa64c41e512745c1e64" uploaded_at="2015-02-20 10:12:00.000000000" created_at="2015-02-20 09:12:34.000000000" file_name="00000_087.jpg"/>
+    <IMAGE_INFO id="2" url="files?id=127a2ab163a0673859e1c14f0d12e5a5" storage_id="127a2ab163a0673859e1c14f0d12e5a5" uploaded_at="2015-02-20 10:12:00.000000000" file_name="i_00000_087.jpg"/>
+    <IMAGE_INFO id="3" url="files?id=2d320c230cb9e294aa9d78cb6b1af147" storage_id="2d320c230cb9e294aa9d78cb6b1af147" hash="2d320c230cb9e294aa9d78cb6b1af147" uploaded_at="2015-02-20 10:12:34.000000000" created_at="2015-02-20 09:13:21.000000000" file_name="00000_102.jpg"/>
+    <IMAGE_INFO id="4" url="files?id=566d9d151013bb21f9b77feb58741c98" storage_id="566d9d151013bb21f9b77feb58741c98" uploaded_at="2015-02-20 10:12:34.000000000" file_name="i_00000_102.jpg"/>
+    <IMAGE_INFO id="5" url="files?id=a39442561f89a80761f42703d9a14534" storage_id="a39442561f89a80761f42703d9a14534" hash="a39442561f89a80761f42703d9a14534" uploaded_at="2015-03-20 11:23:42.000000000" created_at="2015-03-20 08:12:52.000000000" file_name="00001_701.jpg"/>
+    <IMAGE_INFO id="6" url="files?id=59da3ab2ff216d80a1115fa20a63303c" storage_id="59da3ab2ff216d80a1115fa20a63303c" uploaded_at="2015-03-20 11:23:42.000000000" file_name="i_00001_701.jpg"/>
+    <IMAGE_INFO id="7" url="files?id=5b691838047e3ebb8734e03406acfe16" storage_id="5b691838047e3ebb8734e03406acfe16" hash="5b691838047e3ebb8734e03406acfe16" uploaded_at="2015-03-20 11:24:22.000000000" created_at="2015-03-20 08:13:32.000000000" file_name="00002_084.jpg"/>
+    <IMAGE_INFO id="8" url="files?id=48a353ac6e0fd41da118777a73eeb99c" storage_id="48a353ac6e0fd41da118777a73eeb99c" uploaded_at="2015-03-20 11:24:22.000000000" file_name="i_00002_084.jpg"/>
 
     <INDICATION id="1" original_image_info_id="1" indication_image_info_id="2" created_at="2015-02-20 09:12:34.000000000" meter_id="2" value="0.087" consumption="0"/>
     <INDICATION id="2" original_image_info_id="3" indication_image_info_id="4" created_at="2015-02-20 09:13:21.000000000" meter_id="3" value="0.102" consumption="0"/>

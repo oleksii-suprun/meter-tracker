@@ -21,12 +21,12 @@ public class IndicationDto {
     @NotNull
     @PositiveOrZero(message = "Value must be greater or equals to 0")
     private Double value;
-    private long originalImageId;
-    private long indicationImageId;
     private Date uploaded;
     private Date created;
     private String meterName;
     private Integer consumption;
+    private String originalImageUrl;
+    private String indicationImageUrl;
 
     public long getId() {
         return id;
@@ -42,22 +42,6 @@ public class IndicationDto {
 
     public void setValue(Double value) {
         this.value = value;
-    }
-
-    public long getOriginalImageId() {
-        return originalImageId;
-    }
-
-    public void setOriginalImageId(long originalImageId) {
-        this.originalImageId = originalImageId;
-    }
-
-    public long getIndicationImageId() {
-        return indicationImageId;
-    }
-
-    public void setIndicationImageId(long indicationImageId) {
-        this.indicationImageId = indicationImageId;
     }
 
     public Date getUploaded() {
@@ -92,6 +76,22 @@ public class IndicationDto {
         this.consumption = consumption;
     }
 
+    public String getOriginalImageUrl() {
+        return originalImageUrl;
+    }
+
+    public void setOriginalImageUrl(String originalImageUrl) {
+        this.originalImageUrl = originalImageUrl;
+    }
+
+    public String getIndicationImageUrl() {
+        return indicationImageUrl;
+    }
+
+    public void setIndicationImageUrl(String indicationImageUrl) {
+        this.indicationImageUrl = indicationImageUrl;
+    }
+
     public static IndicationDto toDto(Indication indication) {
         if (indication == null) {
             return null;
@@ -99,12 +99,12 @@ public class IndicationDto {
         IndicationDto dto = new IndicationDto();
         dto.id = indication.getId();
         dto.value = indication.getValue();
-        dto.originalImageId = indication.getOriginalImageInfo().getId();
-        dto.indicationImageId = indication.getIndicationImageInfo().getId();
         dto.uploaded = indication.getOriginalImageInfo().getUploadedAt();
         dto.created = indication.getCreatedAt();
         dto.meterName = indication.getMeter().getName();
         dto.consumption = indication.getConsumption();
+        dto.indicationImageUrl = indication.getIndicationImageInfo().getUrl();
+        dto.originalImageUrl = indication.getOriginalImageInfo().getUrl();
         return dto;
     }
 

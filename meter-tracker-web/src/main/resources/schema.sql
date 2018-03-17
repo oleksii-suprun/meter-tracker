@@ -18,7 +18,8 @@ CREATE TABLE image_info (
     hash VARCHAR(255) UNIQUE,
     uploaded_at TIMESTAMP NOT NULL,
     created_at TIMESTAMP,
-    file_name VARCHAR(50) NOT NULL
+    file_name VARCHAR(50) NOT NULL,
+    url VARCHAR(255) UNIQUE
 );
 
 CREATE TABLE indication (

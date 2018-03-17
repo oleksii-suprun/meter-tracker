@@ -74,31 +74,19 @@ public class IndicationService {
         // we wont save files if we cannot extract indication region because exception will be thrown
         FileMetaData originalFileMeta = fileStorage.save(bytes, fileName);
         FileMetaData indicationFileMeta = fileStorage.save(indicationData, "i_" + fileName);
-        Date uploadedAt = new Date();
 
         Indication indication = new Indication();
         indication.setMeter(meter);
-        indication.setOriginalImageInfo(new ImageInfo() {{
-            setUploadedAt(uploadedAt);
-            setFileName(originalFileMeta.getFileName());
-            setHash(originalFileMeta.getHash());
-            setStorageId(originalFileMeta.getFileId());
-            setCreatedAt(originalFileMeta.getCreatedAt());
-        }});
-        indication.setIndicationImageInfo(new ImageInfo() {{
-            setUploadedAt(uploadedAt);
-            setFileName(indicationFileMeta.getFileName());
-            setStorageId(indicationFileMeta.getFileId());
-            setCreatedAt(indicationFileMeta.getCreatedAt());
-        }});
+        indication.setOriginalImageInfo(new ImageInfo(originalFileMeta));
+        indication.setIndicationImageInfo(new ImageInfo(indicationFileMeta));
         indication.setCreatedAt(indication.getOriginalImageInfo().getCreatedAt());
 
         try {
             return indicationRepository.save(indication);
         } catch (Throwable e) {
             // we have to delete files manually to keep data consistent
-            fileStorage.delete(indication.getIndicationImageInfo().toFileMetaData());
-            fileStorage.delete(indication.getOriginalImageInfo().toFileMetaData());
+            fileStorage.delete(indication.getIndicationImageInfo().getStorageId());
+            fileStorage.delete(indication.getOriginalImageInfo().getStorageId());
             throw e;
         }
     }
@@ -150,8 +138,8 @@ public class IndicationService {
                 });
 
         indicationRepository.deleteById(indication.getId());
-        fileStorage.delete(indication.getIndicationImageInfo().toFileMetaData());
-        fileStorage.delete(indication.getOriginalImageInfo().toFileMetaData());
+        fileStorage.delete(indication.getIndicationImageInfo().getStorageId());
+        fileStorage.delete(indication.getOriginalImageInfo().getStorageId());
     }
 
     @Transactional
@@ -176,7 +164,8 @@ public class IndicationService {
             logger.debug("Cannot recognize not existing indication with id: {}", indicationId);
             return new NoSuchElementException("No such indication");
         });
-        BufferedImage extracted = bytesToImage(fileStorage.read(indication.getIndicationImageInfo().toFileMetaData()));
+        FileMetaData fileMetaData = indication.getIndicationImageInfo().toFileMetaData();
+        BufferedImage extracted = bytesToImage(fileStorage.read(fileMetaData.getId()));
         return extractor.extractDigits(extracted, indication.getMeter().getCapacity()).stream()
                 .map(i -> new Digit(ImageUtils.imageToJpgBytes(i), recognizer.isTrained()
                         ? recognizer.recognize(i).orElse(null)

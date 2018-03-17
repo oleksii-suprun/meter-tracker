@@ -1,19 +1,25 @@
 package com.asuprun.metertracker.web.config;
 
 import com.asuprun.metertracker.web.filestorage.FileStorage;
+import com.asuprun.metertracker.web.filestorage.GDriveFileStorage;
 import com.asuprun.metertracker.web.filestorage.LocalFileStorage;
+import com.google.api.client.util.store.DataStoreFactory;
+import com.google.api.client.util.store.FileDataStoreFactory;
 import org.opencv.core.Core;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.env.Environment;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.Properties;
+import java.util.Objects;
+
+import static com.asuprun.metertracker.web.config.ApplicationConfig.Profiles.NOT_TEST;
+import static com.asuprun.metertracker.web.config.ApplicationConfig.Profiles.TEST;
+import static com.asuprun.metertracker.web.filestorage.FileStorageUtils.resolveTilde;
 
 @Configuration
 @PropertySource("classpath:application.properties")
@@ -26,12 +32,6 @@ public class ApplicationConfig {
                 .resolve(System.mapLibraryName(Core.NATIVE_LIBRARY_NAME)).toString());
     }
 
-    @Value("${application.fs.local.path}")
-    private String fileStoragePath;
-
-    @Value("${application.fs.local.bucket.name_length}")
-    private int bucketPathLength;
-
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
@@ -43,11 +43,28 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public FileStorage fileStorage() {
-        return new LocalFileStorage(new Properties() {{
-            setProperty(LocalFileStorage.FS_PATH, fileStoragePath);
-            setProperty(LocalFileStorage.FS_BUCKET_NAME_LENGTH, String.valueOf(bucketPathLength));
-        }});
+    @Profile(TEST)
+    public FileStorage localFileStorage(Environment environment) {
+        return new LocalFileStorage(environment.getProperty("application.fs.local.path"));
+    }
+
+    @Bean
+    @Profile(NOT_TEST)
+    public DataStoreFactory dataStoreFactory(Environment environment) throws IOException {
+        String credentialsStorageDirectory = Objects.requireNonNull(
+                environment.getProperty("application.fs.gdrive.credentials.directory"));
+
+        return new FileDataStoreFactory(new File(resolveTilde(credentialsStorageDirectory)));
+    }
+
+    @Bean
+    @Profile(NOT_TEST)
+    public FileStorage fileStorage(Environment environment,
+                                   DataStoreFactory dataStoreFactory) {
+        return new GDriveFileStorage(
+                environment.getProperty("application.fs.gdrive.directory"),
+                environment.getProperty("application.fs.gdrive.secrets"),
+                dataStoreFactory);
     }
 
     public interface Profiles {

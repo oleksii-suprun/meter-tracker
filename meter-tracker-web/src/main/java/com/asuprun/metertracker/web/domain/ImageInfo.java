@@ -29,6 +29,21 @@ public class ImageInfo {
     @Column(name = "created_at")
     private Date createdAt;
 
+    @Column
+    private String url;
+
+    public ImageInfo() {
+    }
+
+    public ImageInfo(FileMetaData fileMetaData) {
+        this.storageId = fileMetaData.getId();
+        this.hash = fileMetaData.getHash();
+        this.url = fileMetaData.getUrl();
+        this.fileName = fileMetaData.getName();
+        this.createdAt = fileMetaData.getCreatedAt();
+        this.uploadedAt = fileMetaData.getUploadedAt();
+    }
+
     public long getId() {
         return id;
     }
@@ -77,6 +92,14 @@ public class ImageInfo {
         this.createdAt = createdAt;
     }
 
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -87,19 +110,23 @@ public class ImageInfo {
                 Objects.equals(hash, imageInfo.hash) &&
                 Objects.equals(fileName, imageInfo.fileName) &&
                 Objects.equals(uploadedAt, imageInfo.uploadedAt) &&
-                Objects.equals(createdAt, imageInfo.createdAt);
+                Objects.equals(createdAt, imageInfo.createdAt) &&
+                Objects.equals(url, imageInfo.url);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, storageId, hash, fileName, uploadedAt, createdAt);
+        return Objects.hash(id, storageId, hash, fileName, uploadedAt, createdAt, url);
     }
 
     public final FileMetaData toFileMetaData() {
         FileMetaData fileMetaData = new FileMetaData();
-        fileMetaData.setFileId(storageId);
-        fileMetaData.setFileName(fileName);
+        fileMetaData.setId(storageId);
+        fileMetaData.setName(fileName);
         fileMetaData.setHash(hash);
+        fileMetaData.setUrl(url);
+        fileMetaData.setCreatedAt(createdAt);
+        fileMetaData.setUploadedAt(uploadedAt);
         return fileMetaData;
     }
 }

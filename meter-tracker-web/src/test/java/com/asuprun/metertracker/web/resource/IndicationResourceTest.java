@@ -109,8 +109,8 @@ public class IndicationResourceTest {
         assertNotNull(indications);
         assertEquals(1, indications.size());
         assertEquals(3, indications.get(0).getId());
-        assertEquals(5, indications.get(0).getOriginalImageId());
-        assertEquals(6, indications.get(0).getIndicationImageId());
+        assertEquals("files?id=a39442561f89a80761f42703d9a14534", indications.get(0).getOriginalImageUrl());
+        assertEquals("files?id=59da3ab2ff216d80a1115fa20a63303c", indications.get(0).getIndicationImageUrl());
         assertEquals("Hot Water", indications.get(0).getMeterName());
 
         assertEquals(DATE_FORMAT.parse("2015-03-20 08:12:52.000"), indications.get(0).getCreated());
@@ -190,8 +190,8 @@ public class IndicationResourceTest {
         assertNotNull(indication);
         assertEquals(1, indication.getId());
         assertEquals(0.087, indication.getValue(), 1e-6);
-        assertEquals(1, indication.getOriginalImageId());
-        assertEquals(2, indication.getIndicationImageId());
+        assertEquals("files?id=dfc751b80bec8aa64c41e512745c1e64", indication.getOriginalImageUrl());
+        assertEquals("files?id=127a2ab163a0673859e1c14f0d12e5a5", indication.getIndicationImageUrl());
         assertEquals(DATE_FORMAT.parse("2015-02-20 09:12:34.000"), indication.getCreated());
         assertEquals(DATE_FORMAT.parse("2015-02-20 10:12:00.000"), indication.getUploaded());
         assertEquals("Cold Water", indication.getMeterName());
@@ -255,8 +255,8 @@ public class IndicationResourceTest {
         assertNotNull(indication);
         assertEquals(5, client.getCollection(IndicationDto.class).size());
         assertNull(indication.getValue());
-        assertTrue(indication.getOriginalImageId() > 0);
-        assertTrue(indication.getIndicationImageId() > 0);
+        assertEquals("files?id=78cc2a1a8476aa1b5e8529e860086ddb", indication.getOriginalImageUrl());
+        assertEquals("files?id=241398734986232d17e418f87d46660c", indication.getIndicationImageUrl());
         assertTrue(indication.getUploaded().before(new Date()));
         assertEquals(DATE_FORMAT.parse("2015-04-22 08:43:49.255"), indication.getCreated());
         assertEquals("Electricity", indication.getMeterName());
