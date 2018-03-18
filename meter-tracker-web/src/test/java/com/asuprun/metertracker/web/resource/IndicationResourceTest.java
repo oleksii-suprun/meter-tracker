@@ -9,10 +9,12 @@ import com.asuprun.metertracker.web.domain.Digit;
 import com.asuprun.metertracker.web.domain.Indication;
 import com.asuprun.metertracker.web.dto.DigitDto;
 import com.asuprun.metertracker.web.dto.IndicationDto;
+import com.asuprun.metertracker.web.filestorage.FileStorage;
 import com.asuprun.metertracker.web.resource.response.ErrorResponse;
 import com.asuprun.metertracker.web.service.IndicationService;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
+import org.apache.commons.io.FileUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
@@ -21,18 +23,21 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.util.ResourceUtils;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -57,11 +62,34 @@ public class IndicationResourceTest {
     @Autowired
     private IndicationService indicationService;
 
+    @Autowired
+    private FileStorage fileStorage;
+
+    @Value("${application.fs.local.path}")
+    private String fileStoragePath;
+
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
         client.path(PATH);
         client.accept(MediaType.APPLICATION_JSON);
         client.type(MediaType.APPLICATION_JSON);
+
+        // setup local storage directory
+        FileUtils.deleteDirectory(new File(Paths.get(fileStoragePath).toString()));
+        List<String> paths = Arrays.asList(
+                "classpath:images/cold/00000_087.jpg",
+                "classpath:images/cold/i_00000_087.jpg",
+                "classpath:images/hot/00000_102.jpg",
+                "classpath:images/hot/i_00000_102.jpg",
+                "classpath:images/hot/00001_701.jpg",
+                "classpath:images/hot/i_00001_701.jpg",
+                "classpath:images/cold/00002_084.jpg",
+                "classpath:images/cold/i_00002_084.jpg");
+
+        for (String path : paths) {
+            final File file = ResourceUtils.getFile(path);
+            fileStorage.save(Files.readAllBytes(Paths.get(file.getPath())), file.getName());
+        }
     }
 
     @Test
@@ -81,8 +109,8 @@ public class IndicationResourceTest {
         assertNotNull(indications);
         assertEquals(1, indications.size());
         assertEquals(3, indications.get(0).getId());
-        assertEquals(5, indications.get(0).getOriginalImageId());
-        assertEquals(6, indications.get(0).getIndicationImageId());
+        assertEquals("files?id=a39442561f89a80761f42703d9a14534", indications.get(0).getOriginalImageUrl());
+        assertEquals("files?id=59da3ab2ff216d80a1115fa20a63303c", indications.get(0).getIndicationImageUrl());
         assertEquals("Hot Water", indications.get(0).getMeterName());
 
         assertEquals(DATE_FORMAT.parse("2015-03-20 08:12:52.000"), indications.get(0).getCreated());
@@ -162,8 +190,8 @@ public class IndicationResourceTest {
         assertNotNull(indication);
         assertEquals(1, indication.getId());
         assertEquals(0.087, indication.getValue(), 1e-6);
-        assertEquals(1, indication.getOriginalImageId());
-        assertEquals(2, indication.getIndicationImageId());
+        assertEquals("files?id=dfc751b80bec8aa64c41e512745c1e64", indication.getOriginalImageUrl());
+        assertEquals("files?id=127a2ab163a0673859e1c14f0d12e5a5", indication.getIndicationImageUrl());
         assertEquals(DATE_FORMAT.parse("2015-02-20 09:12:34.000"), indication.getCreated());
         assertEquals(DATE_FORMAT.parse("2015-02-20 10:12:00.000"), indication.getUploaded());
         assertEquals("Cold Water", indication.getMeterName());
@@ -211,11 +239,12 @@ public class IndicationResourceTest {
     public void testUpload() throws IOException, ParseException {
         client.type(MediaType.MULTIPART_FORM_DATA);
 
-        final String fileName = "images/cold/00004_006.jpg";
+        final Path filePath = Paths.get("images/cold/00004_006.jpg");
+        final String fileName = filePath.getFileName().toString();
         final long meterId = 1; // electric meter
 
         IndicationDto indication;
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName)) {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(filePath.toString())) {
             MultipartBody body = new MultipartBody(Arrays.asList(
                     new Attachment("file", inputStream, new ContentDisposition("attachment;filename=" + fileName)),
                     new Attachment("meterId", "text/plain", meterId)));
@@ -226,8 +255,8 @@ public class IndicationResourceTest {
         assertNotNull(indication);
         assertEquals(5, client.getCollection(IndicationDto.class).size());
         assertNull(indication.getValue());
-        assertTrue(indication.getOriginalImageId() > 0);
-        assertTrue(indication.getIndicationImageId() > indication.getOriginalImageId());
+        assertEquals("files?id=78cc2a1a8476aa1b5e8529e860086ddb", indication.getOriginalImageUrl());
+        assertEquals("files?id=241398734986232d17e418f87d46660c", indication.getIndicationImageUrl());
         assertTrue(indication.getUploaded().before(new Date()));
         assertEquals(DATE_FORMAT.parse("2015-04-22 08:43:49.255"), indication.getCreated());
         assertEquals("Electricity", indication.getMeterName());
@@ -237,11 +266,12 @@ public class IndicationResourceTest {
     public void testUploadConflict() throws IOException {
         client.type(MediaType.MULTIPART_FORM_DATA);
 
-        final String fileName = "images/cold/00000_087.jpg";
+        final File file = ResourceUtils.getFile("classpath:images/cold/00000_087.jpg");
+        final String fileName = file.getName();
         final long meterId = 1;
 
         Response response;
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName)) {
+        try (InputStream inputStream = new FileInputStream(file)) {
             MultipartBody body = new MultipartBody(Arrays.asList(
                     new Attachment("file", inputStream, new ContentDisposition("attachment;filename=" + fileName)),
                     new Attachment("meterId", "text/plain", meterId)));
@@ -253,11 +283,11 @@ public class IndicationResourceTest {
 
         ErrorResponse errorResponse = TestUtils.readErrorResponseEntity(response);
         assertNotNull(errorResponse);
-        assertEquals("This image was already uploaded", errorResponse.getMessage());
+        assertEquals("File '00000_087.jpg' already exists in the system", errorResponse.getMessage());
     }
 
     @Test
-    public void testUploadBadImage() throws IOException {
+    public void testUploadBadFileType() throws IOException {
         client.type(MediaType.MULTIPART_FORM_DATA);
 
         final String fileName = "application.properties";
@@ -276,7 +306,7 @@ public class IndicationResourceTest {
 
         ErrorResponse errorResponse = TestUtils.readErrorResponseEntity(response);
         assertNotNull(errorResponse);
-        assertEquals("Bad image file provided.", errorResponse.getMessage());
+        assertEquals("Unsupported file extension detected: properties", errorResponse.getMessage());
     }
 
     @Test

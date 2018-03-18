@@ -1,11 +1,9 @@
 package com.asuprun.metertracker.web.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 import javax.validation.constraints.Min;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Date;
+import java.util.Objects;
 
 @SuppressWarnings("unused")
 @Entity
@@ -18,30 +16,24 @@ public class Indication {
     @Column
     private Double value;
 
-    @OneToMany(mappedBy = "assetBindingId.indication", fetch = FetchType.EAGER, orphanRemoval = true)
-    @MapKey(name = "assetBindingId.type")
-    private Map<AssetBinding.Type, AssetBinding> images;
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "original_image_info_id")
+    private ImageInfo originalImageInfo;
 
-    @Column(nullable = false, updatable = false)
-    private Date uploaded;
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "indication_image_info_id")
+    private ImageInfo indicationImageInfo;
 
-    @Column
-    private Date created;
+    @Column(name = "created_at")
+    private Date createdAt;
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "meter_id")
     private Meter meter;
-
-    @JsonIgnore
-    @Column(nullable = false, unique = true, updatable = false)
-    private String hash;
 
     @Column
     @Min(0)
     private Integer consumption;
-
-    public Indication() {
-        this.images = new HashMap<>();
-    }
 
     public long getId() {
         return id;
@@ -59,28 +51,28 @@ public class Indication {
         this.value = value;
     }
 
-    public Map<AssetBinding.Type, AssetBinding> getImages() {
-        return images;
+    public ImageInfo getOriginalImageInfo() {
+        return originalImageInfo;
     }
 
-    public void setImages(Map<AssetBinding.Type, AssetBinding> images) {
-        this.images = images;
+    public void setOriginalImageInfo(ImageInfo originalImageInfo) {
+        this.originalImageInfo = originalImageInfo;
     }
 
-    public Date getUploaded() {
-        return uploaded;
+    public ImageInfo getIndicationImageInfo() {
+        return indicationImageInfo;
     }
 
-    public void setUploaded(Date uploadDate) {
-        this.uploaded = uploadDate;
+    public void setIndicationImageInfo(ImageInfo indicationImageInfo) {
+        this.indicationImageInfo = indicationImageInfo;
     }
 
-    public Date getCreated() {
-        return created;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreated(Date createdDate) {
-        this.created = createdDate;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 
     public Meter getMeter() {
@@ -89,14 +81,6 @@ public class Indication {
 
     public void setMeter(Meter meter) {
         this.meter = meter;
-    }
-
-    public String getHash() {
-        return hash;
-    }
-
-    public void setHash(String hash) {
-        this.hash = hash;
     }
 
     public Integer getConsumption() {
@@ -109,34 +93,17 @@ public class Indication {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         Indication that = (Indication) o;
-
-        Set<Long> thisAssetIds = images.values().stream()
-                .map(AssetBinding::getAsset).map(Asset::getId).collect(Collectors.toSet());
-
-        Set<Long> thatAssetIds = that.images.values().stream()
-                .map(AssetBinding::getAsset).map(Asset::getId).collect(Collectors.toSet());
-
-        return id == that.id
-                && Objects.equals(value, that.value)
-                && Objects.equals(thisAssetIds, thatAssetIds)
-                && Objects.equals(uploaded, that.uploaded)
-                && Objects.equals(created, that.created)
-                && Objects.equals(meter, that.meter)
-                && Objects.equals(hash, that.hash)
-                && Objects.equals(consumption, that.consumption);
+        return id == that.id &&
+                Objects.equals(value, that.value) &&
+                Objects.equals(createdAt, that.createdAt) &&
+                Objects.equals(consumption, that.consumption);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, value, images, uploaded, created, meter, hash, consumption);
+        return Objects.hash(id, value, createdAt, consumption);
     }
 }

@@ -39,7 +39,7 @@
                 </h4>
             </div>
             <div class="modal-body">
-                <img ng-src="rs/asset/{{vm.indicationPreview.imageId}}" data-holder-rendered="true" class="img-responsive">
+                <img ng-src="{{vm.indicationPreview.imageUrl}}" data-holder-rendered="true" class="img-responsive">
             </div>
         </div>
     </div>
@@ -58,7 +58,7 @@
                 <div class="modal-body">
                     <div app-error="local"></div>
                     <div class="form-group">
-                        <img ng-src="rs/asset/{{vm.selectedIndication.indicationImageId}}" data-holder-rendered="true" class="img-responsive col-sm-12">
+                        <img ng-src="{{vm.selectedIndication.indicationImageUrl}}" data-holder-rendered="true" class="img-responsive col-sm-12">
                     </div>
                     <div class="form-group" ng-class="{'has-error': indicationUpdateForm.$invalid}">
                         <label for="inputNewValue" class="col-sm-2 control-label">Value</label>

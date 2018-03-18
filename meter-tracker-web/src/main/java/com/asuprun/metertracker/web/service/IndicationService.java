@@ -5,13 +5,15 @@ import com.asuprun.metertracker.core.image.DigitRecognizer;
 import com.asuprun.metertracker.core.image.IndicationImageProcessor;
 import com.asuprun.metertracker.core.image.IndicationImageProcessorImpl;
 import com.asuprun.metertracker.core.utils.ImageUtils;
-import com.asuprun.metertracker.web.domain.*;
-import com.asuprun.metertracker.web.exception.DataConflictException;
-import com.asuprun.metertracker.web.repository.*;
-import com.drew.imaging.ImageMetadataReader;
-import com.drew.imaging.ImageProcessingException;
-import com.drew.metadata.Metadata;
-import com.drew.metadata.exif.ExifSubIFDDirectory;
+import com.asuprun.metertracker.web.domain.Digit;
+import com.asuprun.metertracker.web.domain.ImageInfo;
+import com.asuprun.metertracker.web.domain.Indication;
+import com.asuprun.metertracker.web.domain.Meter;
+import com.asuprun.metertracker.web.filestorage.FileMetaData;
+import com.asuprun.metertracker.web.filestorage.FileStorage;
+import com.asuprun.metertracker.web.repository.DigitRepository;
+import com.asuprun.metertracker.web.repository.IndicationRepository;
+import com.asuprun.metertracker.web.repository.MeterRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,17 +22,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.criteria.Predicate;
-import javax.xml.bind.DatatypeConverter;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 import static com.asuprun.metertracker.core.utils.ImageUtils.bytesToImage;
 import static com.asuprun.metertracker.core.utils.ImageUtils.imageToJpgBytes;
-import static com.asuprun.metertracker.web.domain.AssetBinding.Type.INDICATION;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
@@ -39,28 +35,23 @@ public class IndicationService {
 
     private static final Logger logger = LoggerFactory.getLogger(IndicationService.class);
 
-    public static final String HASH_ALGORITHM = "SHA-256";
-
     private IndicationImageProcessor extractor;
     private DigitRecognizer recognizer;
 
     private IndicationRepository indicationRepository;
     private DigitRepository digitRepository;
-    private ResourceRepository resourceRepository;
-    private ResourceBindingRepository resourceBindingRepository;
     private MeterRepository meterRepository;
+    private FileStorage fileStorage;
 
     @Autowired
     public IndicationService(IndicationRepository indicationRepository,
                              DigitRepository digitRepository,
-                             ResourceRepository resourceRepository,
-                             ResourceBindingRepository resourceBindingRepository,
-                             MeterRepository meterRepository) {
+                             MeterRepository meterRepository,
+                             FileStorage fileStorage) {
         this.indicationRepository = indicationRepository;
         this.digitRepository = digitRepository;
-        this.resourceRepository = resourceRepository;
-        this.resourceBindingRepository = resourceBindingRepository;
         this.meterRepository = meterRepository;
+        this.fileStorage = fileStorage;
     }
 
     @PostConstruct
@@ -71,67 +62,45 @@ public class IndicationService {
     }
 
     @Transactional
-    public Indication parseAndSaveIndication(byte[] bytes, long meterId) {
+    public Indication parseAndSaveIndication(String fileName, byte[] bytes, long meterId) {
         Meter meter = meterRepository.findById(meterId).orElseThrow(() -> {
             logger.debug("Cannot parse and save image. Meter with id '{}' not found", meterId);
             return new NoSuchElementException("Meter not found");
         });
 
+        // extract region first in order to avoid files save if extraction not possible
+        byte[] indicationData = extractIndicationRegion(bytes);
+
+        // we wont save files if we cannot extract indication region because exception will be thrown
+        FileMetaData originalFileMeta = fileStorage.save(bytes, fileName);
+        FileMetaData indicationFileMeta = fileStorage.save(indicationData, "i_" + fileName);
+
         Indication indication = new Indication();
         indication.setMeter(meter);
-        indication.setUploaded(new Date());
-        indication.setCreated(readCreatedOnMetadata(bytes).orElse(null));
+        indication.setOriginalImageInfo(new ImageInfo(originalFileMeta));
+        indication.setIndicationImageInfo(new ImageInfo(indicationFileMeta));
+        indication.setCreatedAt(indication.getOriginalImageInfo().getCreatedAt());
 
-        String hash = calculateHash(bytes);
-        indication.setHash(hash);
-        indication = saveIndication(indication);
-
-        AssetBinding bindingFull = new AssetBinding();
-        bindingFull.setAssetBindingId(new AssetBindingId(AssetBinding.Type.ORIGINAL, indication));
-        bindingFull.setAsset(resourceRepository.save(new Asset(bytes)));
-
-        AssetBinding bindingIndication = new AssetBinding();
         try {
-            bytes = imageToJpgBytes(extractor.extractIndicationRegion(bytesToImage(bytes)));
-            bindingIndication.setAssetBindingId(new AssetBindingId(INDICATION, indication));
-            bindingIndication.setAsset(resourceRepository.save(new Asset(bytes)));
+            return indicationRepository.save(indication);
+        } catch (Throwable e) {
+            // we have to delete files manually to keep data consistent
+            fileStorage.delete(indication.getIndicationImageInfo().getStorageId());
+            fileStorage.delete(indication.getOriginalImageInfo().getStorageId());
+            throw e;
+        }
+    }
+
+    private byte[] extractIndicationRegion(byte[] original) {
+        try {
+            return imageToJpgBytes(extractor.extractIndicationRegion(bytesToImage(original)));
         } catch (BorderNotFoundException e) {
             logger.warn("Cannot detect indication borders.", e);
             throw new IllegalArgumentException("Cannot detect indication region.");
         } catch (Exception e) {
-            logger.warn("Cannot uploaded image.", e);
+            logger.warn("Cannot process image.", e);
             throw new IllegalArgumentException("Bad image file provided.");
         }
-
-        indication.getImages().put(AssetBinding.Type.ORIGINAL, resourceBindingRepository.save(bindingFull));
-        indication.getImages().put(INDICATION, resourceBindingRepository.save(bindingIndication));
-        return indication;
-    }
-
-    private Optional<Metadata> readMetadata(byte[] bytes) {
-        try {
-            return Optional.of(ImageMetadataReader.readMetadata(new ByteArrayInputStream(bytes)));
-        } catch (ImageProcessingException | IOException e) {
-            logger.warn("Cannot read image metadata");
-            logger.debug("Cannot read image metadata", e);
-        }
-        return Optional.empty();
-    }
-
-    private Optional<Date> readCreatedOnMetadata(byte[] bytes) {
-        return readMetadata(bytes)
-                .map(m -> m.getFirstDirectoryOfType(ExifSubIFDDirectory.class))
-                .map(d -> d.getDateOriginal(TimeZone.getDefault()));
-    }
-
-    @Transactional
-    public Indication saveIndication(Indication indication) {
-        indicationRepository.findByHash(indication.getHash())
-                .ifPresent(i -> {
-                    logger.debug("Cannot save indication because image with hash '{}' already exists");
-                    throw new DataConflictException("This image was already uploaded");
-                });
-        return indicationRepository.save(indication);
     }
 
     public Optional<Indication> findById(long id) {
@@ -160,12 +129,17 @@ public class IndicationService {
         });
     }
 
+    @Transactional
     public void delete(long id) {
-        if (!indicationRepository.existsById(id)) {
-            logger.debug("Cannot delete not existing indication with id: {}", id);
-            throw new NoSuchElementException("No such indication");
-        }
-        indicationRepository.deleteById(id);
+        Indication indication = indicationRepository.findById(id)
+                .orElseThrow(() -> {
+                    logger.debug("Cannot delete not existing indication with id: {}", id);
+                    return new NoSuchElementException("No such indication");
+                });
+
+        indicationRepository.deleteById(indication.getId());
+        fileStorage.delete(indication.getIndicationImageInfo().getStorageId());
+        fileStorage.delete(indication.getOriginalImageInfo().getStorageId());
     }
 
     @Transactional
@@ -179,7 +153,7 @@ public class IndicationService {
         persisted.setValue(indication.getValue());
         persisted.setConsumption(calculateConsumption(
                 persisted.getMeter().getId(),
-                persisted.getCreated(),
+                persisted.getCreatedAt(),
                 persisted.getValue()));
 
         indicationRepository.save(persisted);
@@ -190,7 +164,8 @@ public class IndicationService {
             logger.debug("Cannot recognize not existing indication with id: {}", indicationId);
             return new NoSuchElementException("No such indication");
         });
-        BufferedImage extracted = bytesToImage(indication.getImages().get(INDICATION).getAsset().getData());
+        FileMetaData fileMetaData = indication.getIndicationImageInfo().toFileMetaData();
+        BufferedImage extracted = bytesToImage(fileStorage.read(fileMetaData.getId()));
         return extractor.extractDigits(extracted, indication.getMeter().getCapacity()).stream()
                 .map(i -> new Digit(ImageUtils.imageToJpgBytes(i), recognizer.isTrained()
                         ? recognizer.recognize(i).orElse(null)
@@ -212,8 +187,10 @@ public class IndicationService {
         digits.stream().filter(d -> d.getImage() != null).forEach(digitRepository::save);
 
         double value = parseValue(digits.stream().map(Digit::getValue).collect(joining()), indication.getMeter());
+        int consumption = calculateConsumption(indication.getMeter().getId(), indication.getCreatedAt(), value);
+
         indication.setValue(value);
-        indication.setConsumption(calculateConsumption(indication.getMeter().getId(), indication.getCreated(), value));
+        indication.setConsumption(consumption);
         indicationRepository.save(indication);
 
         trainRecognizer();
@@ -245,16 +222,4 @@ public class IndicationService {
             );
         }
     }
-
-    private String calculateHash(byte[] image) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance(HASH_ALGORITHM);
-            digest.update(image);
-            return DatatypeConverter.printHexBinary(digest.digest());
-        } catch (NoSuchAlgorithmException e) {
-            logger.warn("Cannot calculate image hash.", e);
-            throw new RuntimeException("Exception during image hash calculation", e);
-        }
-    }
-
 }

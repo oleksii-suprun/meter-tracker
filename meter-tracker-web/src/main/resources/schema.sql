@@ -12,28 +12,26 @@ CREATE TABLE meter (
     CHECK (capacity > minor_digits)
 );
 
+CREATE TABLE image_info (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    storage_id VARCHAR(50) NOT NULL,
+    hash VARCHAR(255) UNIQUE,
+    uploaded_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP,
+    file_name VARCHAR(50) NOT NULL,
+    url VARCHAR(255) UNIQUE
+);
+
 CREATE TABLE indication (
     id BIGINT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    created TIMESTAMP,
-    hash VARCHAR(255) UNIQUE NOT NULL,
+    created_at TIMESTAMP,
     meter_id BIGINT NOT NULL,
-    uploaded TIMESTAMP NOT NULL,
     value DOUBLE,
+    original_image_info_id BIGINT NOT NULL,
+    indication_image_info_id BIGINT NOT NULL,
     consumption INTEGER,
     CHECK consumption >= 0,
-    FOREIGN KEY (meter_id) REFERENCES meter (id)
-);
-
-CREATE TABLE asset (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    data BLOB NOT NULL
-);
-
-CREATE TABLE indication_asset_binding (
-    type INTEGER NOT NULL,
-    indication_id BIGINT NOT NULL,
-    asset_id BIGINT,
-    PRIMARY KEY (indication_id, type),
-    FOREIGN KEY (indication_id) REFERENCES indication (id),
-    FOREIGN KEY (asset_id) REFERENCES asset (id)
+    FOREIGN KEY (meter_id) REFERENCES meter(id),
+    FOREIGN KEY (original_image_info_id) REFERENCES image_info(id),
+    FOREIGN KEY (indication_image_info_id) REFERENCES image_info(id)
 );

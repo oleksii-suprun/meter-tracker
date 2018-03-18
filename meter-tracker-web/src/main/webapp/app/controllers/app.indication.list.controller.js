@@ -18,7 +18,7 @@
 
         this.onViewImageClick = function (indication) {
             vm.indicationPreview.created = indication.created;
-            vm.indicationPreview.imageId = indication.originalImageId;
+            vm.indicationPreview.imageUrl = indication.originalImageUrl;
         };
 
         this.onEditClick = function (indication) {

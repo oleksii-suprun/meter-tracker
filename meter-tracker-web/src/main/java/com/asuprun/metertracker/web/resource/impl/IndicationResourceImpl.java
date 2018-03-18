@@ -1,5 +1,6 @@
 package com.asuprun.metertracker.web.resource.impl;
 
+import com.asuprun.metertracker.web.domain.Indication;
 import com.asuprun.metertracker.web.dto.DigitDto;
 import com.asuprun.metertracker.web.dto.IndicationDto;
 import com.asuprun.metertracker.web.resource.IndicationResource;
@@ -9,10 +10,13 @@ import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import javax.activation.DataHandler;
 import javax.ws.rs.core.Response;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -22,6 +26,9 @@ public class IndicationResourceImpl implements IndicationResource {
     private static Logger logger = LoggerFactory.getLogger(IndicationResource.class);
 
     private IndicationService indicationService;
+
+    @Value("${application.allowed.extensions}")
+    private String[] allowedExtensions;
 
     @Autowired
     public IndicationResourceImpl(IndicationService indicationService) {
@@ -74,10 +81,19 @@ public class IndicationResourceImpl implements IndicationResource {
 
     @Override
     public Response upload(Attachment attachment, Long meterId) throws Exception {
-        try (InputStream inputStream = attachment.getDataHandler().getInputStream()) {
+        DataHandler dataHandler = attachment.getDataHandler();
+        String fileName = dataHandler.getName();
+        String extension = fileName.substring(fileName.indexOf('.') + 1);
+
+        if (Arrays.stream(this.allowedExtensions).noneMatch(x -> x.equalsIgnoreCase(extension))) {
+            throw new IllegalArgumentException("Unsupported file extension detected: " + extension);
+        }
+
+        try (InputStream inputStream = dataHandler.getInputStream()) {
+            byte[] bytes = IOUtils.toByteArray(inputStream);
+            Indication indication = indicationService.parseAndSaveIndication(fileName, bytes, meterId);
             return Response.status(Response.Status.CREATED)
-                    .entity(IndicationDto.toDto(indicationService
-                            .parseAndSaveIndication(IOUtils.toByteArray(inputStream), meterId)))
+                    .entity(IndicationDto.toDto(indication))
                     .build();
         }
     }

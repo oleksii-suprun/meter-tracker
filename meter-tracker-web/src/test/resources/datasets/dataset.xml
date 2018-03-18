@@ -25,26 +25,17 @@
     <DIGIT id="24" image="./src/test/resources/images/digits/8/2.jpg" value="8"/>
     <DIGIT id="25" image="./src/test/resources/images/digits/9/1.jpg" value="9"/>
 
-    <INDICATION id="1" created="2015-02-20 09:12:34.000000000" hash="29EB0BC0ECF5DCC5C6A6239D6427789C7B4C1CD8252A18A8A2E5A21A17998F85" meter_id="2" uploaded="2015-02-20 10:12:00.000000000" value="0.087" consumption="0"/>
-    <INDICATION id="2" created="2015-02-20 09:13:21.000000000" hash="BC4F71326B4BFE3F9265392D74A05773FB7463DDA9BEE922A627DC4556D8A9F7" meter_id="3" uploaded="2015-02-20 10:12:34.000000000" value="0.102" consumption="0"/>
-    <INDICATION id="3" created="2015-03-20 08:12:52.000000000" hash="AF657B3B19D8541A0B476209D395662F1F18C4350891D677F7FEF184990504B7" meter_id="3" uploaded="2015-03-20 11:23:42.000000000"/>
-    <INDICATION id="4" created="2015-03-20 08:13:32.000000000" hash="78BE3571F1966473AC9794908F8123B1AF3DC002169BFF01FDE4898411B50746" meter_id="2" uploaded="2015-03-20 11:24:22.000000000" value="2.084" consumption="2"/>
+    <IMAGE_INFO id="1" url="files?id=dfc751b80bec8aa64c41e512745c1e64" storage_id="dfc751b80bec8aa64c41e512745c1e64" hash="dfc751b80bec8aa64c41e512745c1e64" uploaded_at="2015-02-20 10:12:00.000000000" created_at="2015-02-20 09:12:34.000000000" file_name="00000_087.jpg"/>
+    <IMAGE_INFO id="2" url="files?id=127a2ab163a0673859e1c14f0d12e5a5" storage_id="127a2ab163a0673859e1c14f0d12e5a5" uploaded_at="2015-02-20 10:12:00.000000000" file_name="i_00000_087.jpg"/>
+    <IMAGE_INFO id="3" url="files?id=2d320c230cb9e294aa9d78cb6b1af147" storage_id="2d320c230cb9e294aa9d78cb6b1af147" hash="2d320c230cb9e294aa9d78cb6b1af147" uploaded_at="2015-02-20 10:12:34.000000000" created_at="2015-02-20 09:13:21.000000000" file_name="00000_102.jpg"/>
+    <IMAGE_INFO id="4" url="files?id=566d9d151013bb21f9b77feb58741c98" storage_id="566d9d151013bb21f9b77feb58741c98" uploaded_at="2015-02-20 10:12:34.000000000" file_name="i_00000_102.jpg"/>
+    <IMAGE_INFO id="5" url="files?id=a39442561f89a80761f42703d9a14534" storage_id="a39442561f89a80761f42703d9a14534" hash="a39442561f89a80761f42703d9a14534" uploaded_at="2015-03-20 11:23:42.000000000" created_at="2015-03-20 08:12:52.000000000" file_name="00001_701.jpg"/>
+    <IMAGE_INFO id="6" url="files?id=59da3ab2ff216d80a1115fa20a63303c" storage_id="59da3ab2ff216d80a1115fa20a63303c" uploaded_at="2015-03-20 11:23:42.000000000" file_name="i_00001_701.jpg"/>
+    <IMAGE_INFO id="7" url="files?id=5b691838047e3ebb8734e03406acfe16" storage_id="5b691838047e3ebb8734e03406acfe16" hash="5b691838047e3ebb8734e03406acfe16" uploaded_at="2015-03-20 11:24:22.000000000" created_at="2015-03-20 08:13:32.000000000" file_name="00002_084.jpg"/>
+    <IMAGE_INFO id="8" url="files?id=48a353ac6e0fd41da118777a73eeb99c" storage_id="48a353ac6e0fd41da118777a73eeb99c" uploaded_at="2015-03-20 11:24:22.000000000" file_name="i_00002_084.jpg"/>
 
-    <ASSET id="1" data="./src/test/resources/images/cold/00000_087.jpg"/>
-    <ASSET id="2" data="./src/test/resources/images/cold/00000_087-m.jpg"/>
-    <ASSET id="3" data="./src/test/resources/images/hot/00000_102.jpg"/>
-    <ASSET id="4" data="./src/test/resources/images/hot/00000_102-m.jpg"/>
-    <ASSET id="5" data="./src/test/resources/images/hot/00001_701.jpg"/>
-    <ASSET id="6" data="./src/test/resources/images/hot/00001_701-m.jpg"/>
-    <ASSET id="7" data="./src/test/resources/images/cold/00002_084.jpg"/>
-    <ASSET id="8" data="./src/test/resources/images/cold/00002_084-m.jpg"/>
-
-    <INDICATION_ASSET_BINDING type="0" indication_id="1" asset_id="1"/>
-    <INDICATION_ASSET_BINDING type="1" indication_id="1" asset_id="2"/>
-    <INDICATION_ASSET_BINDING type="0" indication_id="2" asset_id="3"/>
-    <INDICATION_ASSET_BINDING type="1" indication_id="2" asset_id="4"/>
-    <INDICATION_ASSET_BINDING type="0" indication_id="3" asset_id="5"/>
-    <INDICATION_ASSET_BINDING type="1" indication_id="3" asset_id="6"/>
-    <INDICATION_ASSET_BINDING type="0" indication_id="4" asset_id="7"/>
-    <INDICATION_ASSET_BINDING type="1" indication_id="4" asset_id="8"/>
+    <INDICATION id="1" original_image_info_id="1" indication_image_info_id="2" created_at="2015-02-20 09:12:34.000000000" meter_id="2" value="0.087" consumption="0"/>
+    <INDICATION id="2" original_image_info_id="3" indication_image_info_id="4" created_at="2015-02-20 09:13:21.000000000" meter_id="3" value="0.102" consumption="0"/>
+    <INDICATION id="3" original_image_info_id="5" indication_image_info_id="6" created_at="2015-03-20 08:12:52.000000000" meter_id="3"/>
+    <INDICATION id="4" original_image_info_id="7" indication_image_info_id="8" created_at="2015-03-20 08:13:32.000000000" meter_id="2" value="2.084" consumption="2"/>
 </dataset>
