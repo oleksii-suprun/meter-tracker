@@ -5,7 +5,6 @@ import com.asuprun.metertracker.core.image.transform.TransformSequence;
 import com.asuprun.metertracker.core.image.transform.impl.GaussianBlurTransformStrategy;
 import com.asuprun.metertracker.core.image.transform.impl.GreyscaleTransformStrategy;
 import com.asuprun.metertracker.core.image.transform.impl.ThresholdTransformStrategy;
-import com.asuprun.metertracker.core.utils.ImageTracer;
 import com.asuprun.metertracker.core.utils.ImageUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -61,9 +60,9 @@ public class RecognitionTest {
                     .transform(new ThresholdTransformStrategy(355))
                     .execute(original);
             result = eliminateGarbage(result);
-
-            ImageTracer.getInstance().trace(ImageUtils.matToImage(result), "FINAL");
         }
+
+        // FIXME: no assertions
     }
 
     @Ignore

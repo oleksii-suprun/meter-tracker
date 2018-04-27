@@ -1,8 +1,6 @@
 package com.asuprun.metertracker.core.image.transform.impl;
 
 import com.asuprun.metertracker.core.image.transform.TransformStrategy;
-import com.asuprun.metertracker.core.utils.ImageTracer;
-import com.asuprun.metertracker.core.utils.ImageUtils;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
@@ -30,8 +28,8 @@ public class CannyTransformStrategy implements TransformStrategy {
 
     @Override
     public Mat transform(Mat source) {
-        Imgproc.Canny(source, source, minThreshold, maxThreshold);
-        ImageTracer.getInstance().trace(ImageUtils.matToImage(source), "canny");
-        return source;
+        Mat target = source.clone();
+        Imgproc.Canny(target, source, minThreshold, maxThreshold);
+        return target;
     }
 }

@@ -1,5 +1,7 @@
 package com.asuprun.metertracker.core.image.transform;
 
+import com.asuprun.metertracker.core.logger.CvLogger;
+import com.asuprun.metertracker.core.logger.NoOpCvLogger;
 import org.opencv.core.Mat;
 
 import java.awt.image.BufferedImage;
@@ -12,9 +14,15 @@ import static com.asuprun.metertracker.core.utils.ImageUtils.matToImage;
 public class TransformSequence {
 
     private Queue<TransformStrategy> sequence;
+    private CvLogger cvLogger;
+
+    public TransformSequence(CvLogger cvLogger) {
+        this.sequence = new ArrayDeque<>();
+        this.cvLogger = cvLogger;
+    }
 
     public TransformSequence() {
-        sequence = new ArrayDeque<>();
+        this(new NoOpCvLogger());
     }
 
     public TransformSequence transform(TransformStrategy strategy) {
@@ -30,6 +38,9 @@ public class TransformSequence {
         if (sequence.isEmpty()) {
             return source;
         }
-        return execute(sequence.remove().transform(source));
+        TransformStrategy strategy = sequence.remove();
+        Mat transformed = strategy.transform(source);
+        cvLogger.trace(transformed, strategy.getClass().getSimpleName());
+        return execute(transformed);
     }
 }

@@ -11,6 +11,7 @@ import org.opencv.core.Core;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +39,8 @@ public class IndicationImageProcessorTest {
 
     @BeforeClass
     public static void init() {
-        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        System.load(Paths.get(System.getenv("OPENCV_JAVA_PATH"))
+                .resolve(System.mapLibraryName(Core.NATIVE_LIBRARY_NAME)).toString());
     }
 
     @Before
@@ -54,7 +56,7 @@ public class IndicationImageProcessorTest {
     }
 
     @Test
-    public void testExtract() throws BorderNotFoundException, IOException {
+    public void testExtract() throws BorderNotFoundException {
         // data/output/extracted/IMG_0021_IN.JPG
         BufferedImage result = indicationImageProcessor.extractIndicationRegion(originalImages.get(0));
         assertEquals(extractedImages.get(0).getHeight(), result.getHeight());

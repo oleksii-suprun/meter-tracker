@@ -18,7 +18,9 @@ public class ResizeTransformStrategy implements TransformStrategy {
     @Override
     public Mat transform(Mat source) {
         if (source.width() != width || source.height() != height) {
-            Imgproc.resize(source, source, new Size(width, height));
+            Mat target = source.clone();
+            Imgproc.resize(source, target, new Size(width, height));
+            return target;
         }
         return source;
     }

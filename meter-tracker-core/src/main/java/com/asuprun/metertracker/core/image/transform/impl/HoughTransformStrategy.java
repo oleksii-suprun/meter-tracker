@@ -17,7 +17,8 @@ public class HoughTransformStrategy implements TransformStrategy {
 
     @Override
     public Mat transform(Mat source) {
-        Imgproc.HoughLines(source, source, 1, Math.PI / 180, threshold);
-        return source;
+        Mat target = source.clone();
+        Imgproc.HoughLines(target, source, 1, Math.PI / 180, threshold);
+        return target;
     }
 }
