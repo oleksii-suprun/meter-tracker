@@ -1,6 +1,7 @@
 package com.asuprun.metertracker.core.logger;
 
 import com.asuprun.metertracker.core.logger.CvLogger.Level;
+import com.asuprun.metertracker.core.utils.FileStorageUtils;
 import com.asuprun.metertracker.core.utils.Settings;
 
 import java.nio.file.Path;
@@ -19,6 +20,7 @@ public final class CvLoggerFactory {
                 .orElse(Level.OFF.name()));
 
         Path rootDirectory = Settings.getInstance().getString("cv.log.directory")
+                .map(FileStorageUtils::resolveTilde)
                 .map(Paths::get)
                 .orElse(null);
 

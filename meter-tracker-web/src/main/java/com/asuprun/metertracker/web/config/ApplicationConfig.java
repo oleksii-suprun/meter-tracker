@@ -19,7 +19,7 @@ import java.util.Objects;
 
 import static com.asuprun.metertracker.web.config.ApplicationConfig.Profiles.NOT_TEST;
 import static com.asuprun.metertracker.web.config.ApplicationConfig.Profiles.TEST;
-import static com.asuprun.metertracker.web.filestorage.FileStorageUtils.resolveTilde;
+import static com.asuprun.metertracker.core.utils.FileStorageUtils.resolveTilde;
 
 @Configuration
 @PropertySource("classpath:application.properties")
