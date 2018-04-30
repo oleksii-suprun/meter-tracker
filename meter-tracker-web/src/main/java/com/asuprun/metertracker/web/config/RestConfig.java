@@ -1,5 +1,6 @@
 package com.asuprun.metertracker.web.config;
 
+import com.asuprun.metertracker.web.config.ApplicationConfig.Profiles;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.models.Info;
@@ -58,7 +59,7 @@ public class RestConfig extends JaxRsConfig {
     }
 
     @Bean
-    @Profile(ApplicationConfig.Profiles.NOT_TEST)
+    @Profile(Profiles.NOT_TEST)
     public BeanConfig swaggerConfig() {
         BeanConfig beanConfig = new BeanConfig();
         beanConfig.setResourcePackage("com.asuprun.metertracker.web.resource");
@@ -71,7 +72,7 @@ public class RestConfig extends JaxRsConfig {
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    @Profile(ApplicationConfig.Profiles.TEST)
+    @Profile(Profiles.TEST)
     public WebClient webClient() {
         WebClient client = WebClient.create(getAddress(), Collections.singletonList(jacksonJsonProvider()));
         WebClient.getConfig(client).getRequestContext().put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
@@ -84,7 +85,7 @@ public class RestConfig extends JaxRsConfig {
     }
 
     private String getAddress() {
-        return Stream.of(applicationContext.getEnvironment().getActiveProfiles()).anyMatch(p -> p.equals("test"))
+        return Stream.of(applicationContext.getEnvironment().getActiveProfiles()).anyMatch(p -> p.equals(Profiles.TEST))
                 ? "local://" + API_BASE_PATH
                 : "/";
     }

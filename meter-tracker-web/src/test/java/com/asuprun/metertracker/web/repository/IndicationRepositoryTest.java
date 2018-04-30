@@ -3,14 +3,12 @@ package com.asuprun.metertracker.web.repository;
 import com.asuprun.metertracker.web.config.ApplicationConfig;
 import com.asuprun.metertracker.web.config.RepositoryConfig;
 import com.asuprun.metertracker.web.domain.Indication;
-import com.github.springtestdbunit.DbUnitTestExecutionListener;
-import com.github.springtestdbunit.annotation.DatabaseSetup;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.time.Instant;
@@ -19,13 +17,11 @@ import java.util.Optional;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.springframework.test.context.TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS;
 
+@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {ApplicationConfig.class, RepositoryConfig.class})
 @ActiveProfiles(ApplicationConfig.Profiles.TEST)
-@TestExecutionListeners(listeners = {DbUnitTestExecutionListener.class}, mergeMode = MERGE_WITH_DEFAULTS)
-@DatabaseSetup("classpath:datasets/dataset.xml")
 public class IndicationRepositoryTest {
 
     @Autowired
