@@ -1,8 +1,7 @@
 package com.asuprun.metertracker.core.image.transform.impl;
 
 import com.asuprun.metertracker.core.image.transform.TransformStrategy;
-import com.asuprun.metertracker.core.utils.ImageTracer;
-import com.asuprun.metertracker.core.utils.ImageUtils;
+import com.asuprun.metertracker.core.utils.Geom;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -21,9 +20,9 @@ public class PerspectiveTransformStrategy implements TransformStrategy {
     private int width;
     private List<Point> corners;
 
-    public PerspectiveTransformStrategy(int height, int width, List<Point> corners) {
-        this.height = height;
-        this.width = width;
+    public PerspectiveTransformStrategy(List<Point> corners) {
+        this.height = (int) Geom.distance(corners.get(0), corners.get(3));
+        this.width = (int) Geom.distance(corners.get(0), corners.get(1));
         this.corners = corners;
     }
 
@@ -35,9 +34,12 @@ public class PerspectiveTransformStrategy implements TransformStrategy {
                 new Point(quad.cols() - 1, 0),
                 new Point(quad.cols() - 1, quad.rows() - 1),
                 new Point(0, quad.rows()));
-        Mat transmtx = Imgproc.getPerspectiveTransform(Converters.vector_Point2f_to_Mat(corners), Converters.vector_Point2f_to_Mat(quadPts));
+
+        Mat transmtx = Imgproc.getPerspectiveTransform(
+                Converters.vector_Point2f_to_Mat(corners),
+                Converters.vector_Point2f_to_Mat(quadPts));
+
         Imgproc.warpPerspective(source, quad, transmtx, quad.size());
-        ImageTracer.getInstance().trace(ImageUtils.matToImage(quad), "perspective");
         return quad;
     }
 }

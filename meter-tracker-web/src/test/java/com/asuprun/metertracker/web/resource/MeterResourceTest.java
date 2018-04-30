@@ -7,6 +7,7 @@ import com.asuprun.metertracker.web.domain.Meter;
 import com.github.springtestdbunit.DbUnitTestExecutionListener;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.springframework.test.context.TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS;
 
+@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {ApplicationConfig.class, RepositoryConfig.class, RestConfig.class})
 @ActiveProfiles(ApplicationConfig.Profiles.TEST)

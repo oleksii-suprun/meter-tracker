@@ -1,8 +1,6 @@
 package com.asuprun.metertracker.core.image.transform.impl;
 
 import com.asuprun.metertracker.core.image.transform.TransformStrategy;
-import com.asuprun.metertracker.core.utils.ImageTracer;
-import com.asuprun.metertracker.core.utils.ImageUtils;
 import org.opencv.core.Mat;
 import org.opencv.imgproc.Imgproc;
 
@@ -19,8 +17,8 @@ public class ThresholdTransformStrategy implements TransformStrategy {
 
     @Override
     public Mat transform(Mat source) {
-        Imgproc.threshold(source, source, 0, maxValue, Imgproc.THRESH_OTSU);
-        ImageTracer.getInstance().trace(ImageUtils.matToImage(source), "threshold");
-        return source;
+        Mat target = source.clone();
+        Imgproc.threshold(source, target, 0, maxValue, Imgproc.THRESH_OTSU);
+        return target;
     }
 }

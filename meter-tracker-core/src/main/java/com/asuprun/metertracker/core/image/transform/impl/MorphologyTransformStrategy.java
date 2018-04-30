@@ -1,8 +1,6 @@
 package com.asuprun.metertracker.core.image.transform.impl;
 
 import com.asuprun.metertracker.core.image.transform.TransformStrategy;
-import com.asuprun.metertracker.core.utils.ImageTracer;
-import com.asuprun.metertracker.core.utils.ImageUtils;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -27,8 +25,8 @@ public class MorphologyTransformStrategy implements TransformStrategy {
 
     @Override
     public Mat transform(Mat source) {
-        Imgproc.morphologyEx(source, source, operation, Mat.ones(kHeight, kWidth, CvType.CV_8U), new Point(-1, -1), iterations);
-        ImageTracer.getInstance().trace(ImageUtils.matToImage(source), "morphology");
-        return source;
+        Mat target = source.clone();
+        Imgproc.morphologyEx(source, target, operation, Mat.ones(kHeight, kWidth, CvType.CV_8U), new Point(-1, -1), iterations);
+        return target;
     }
 }

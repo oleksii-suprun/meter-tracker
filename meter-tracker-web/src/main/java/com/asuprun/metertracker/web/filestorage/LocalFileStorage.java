@@ -1,5 +1,6 @@
 package com.asuprun.metertracker.web.filestorage;
 
+import com.asuprun.metertracker.core.utils.FileStorageUtils;
 import com.asuprun.metertracker.web.exception.DataConflictException;
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;

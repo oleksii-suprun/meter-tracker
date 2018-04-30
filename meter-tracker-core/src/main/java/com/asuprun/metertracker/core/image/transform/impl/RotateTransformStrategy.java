@@ -1,8 +1,6 @@
 package com.asuprun.metertracker.core.image.transform.impl;
 
 import com.asuprun.metertracker.core.image.transform.TransformStrategy;
-import com.asuprun.metertracker.core.utils.ImageTracer;
-import com.asuprun.metertracker.core.utils.ImageUtils;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.imgproc.Imgproc;
@@ -28,8 +26,8 @@ public class RotateTransformStrategy implements TransformStrategy {
 
     @Override
     public Mat transform(Mat source) {
-        Imgproc.warpAffine(source, source, rotationMat, source.size());
-        ImageTracer.getInstance().trace(ImageUtils.matToImage(source), "rotate");
-        return source;
+        Mat target = source.clone();
+        Imgproc.warpAffine(source, target, rotationMat, source.size());
+        return target;
     }
 }

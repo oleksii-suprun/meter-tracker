@@ -1,6 +1,7 @@
 package com.asuprun.metertracker.core.utils;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.Properties;
 
 /**
@@ -13,7 +14,7 @@ import java.util.Properties;
  */
 public final class Settings {
 
-    public static final String PROPERTIES_FILE = "cv.properties";
+    private static final String PROPERTIES_FILE = "cv.properties";
 
     private static volatile Settings instance;
     private Properties properties;
@@ -72,7 +73,7 @@ public final class Settings {
      * @param key string key for defined property
      * @return string value or null if there is no property with provided key
      */
-    public String getString(String key) {
-        return properties.getProperty(key);
+    public Optional<String> getString(String key) {
+        return Optional.ofNullable(properties.getProperty(key));
     }
 }

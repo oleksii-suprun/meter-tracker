@@ -1,7 +1,6 @@
 package com.asuprun.metertracker.core.utils;
 
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
+import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
 
 import javax.imageio.ImageIO;
@@ -10,6 +9,8 @@ import java.awt.image.DataBufferByte;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Helper class to centralize common operations with images or separate pixels.
@@ -95,5 +96,15 @@ public class ImageUtils {
         BufferedImage image = new BufferedImage(m.cols(), m.rows(), type);
         image.getRaster().setDataElements(0, 0, m.cols(), m.rows(), resultBytes);
         return image;
+    }
+
+    public static Mat drawPolygon(Mat source, List<Point> vertexes, Scalar color) {
+        Mat target = source.clone();
+        int thickness = (int) (0.5 * Math.min(target.width(), target.height()) / 100); // 0.5%
+
+        List<MatOfPoint> pts = Collections.singletonList(new MatOfPoint(vertexes.toArray(new Point[0])));
+        Imgproc.polylines(target, pts, true, color, thickness);
+
+        return target;
     }
 }

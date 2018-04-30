@@ -3,6 +3,8 @@ package com.asuprun.metertracker.core.image;
 import com.asuprun.metertracker.core.exception.BorderNotFoundException;
 import com.asuprun.metertracker.core.image.transform.TransformSequence;
 import com.asuprun.metertracker.core.image.transform.impl.*;
+import com.asuprun.metertracker.core.logger.CvLogger;
+import com.asuprun.metertracker.core.logger.CvLoggerFactory;
 import com.asuprun.metertracker.core.utils.Geom;
 import com.asuprun.metertracker.core.utils.ImageUtils;
 import com.asuprun.metertracker.core.utils.Settings;
@@ -14,26 +16,30 @@ import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.asuprun.metertracker.core.utils.ImageUtils.drawPolygon;
+
 public class IndicationImageProcessorImpl implements IndicationImageProcessor {
 
-    public static final int DIMENSIONS_RATIO = 4;
+    private static final int DIMENSIONS_RATIO = 4;
 
     @Override
     public BufferedImage extractIndicationRegion(BufferedImage source) throws BorderNotFoundException {
+        CvLogger cvLogger = CvLoggerFactory.getLogger("IndicationImageProcessorImpl#extractIndicationRegion");
         Mat original = ImageUtils.imageToMat(source);
 
         // greyscale and threshold source image
-        Mat mat = new TransformSequence()
+        Mat transformed = new TransformSequence(cvLogger)
                 .transform(new GaussianBlurTransformStrategy(Settings.getInstance().getInt("cv.gaussian.radius")))
                 .transform(new GreyscaleTransformStrategy())
                 .transform(new ThresholdTransformStrategy(Settings.getInstance().getInt("cv.threshold.max")))
                 .execute(original);
 
         List<MatOfPoint> contours = new ArrayList<>();
-        Imgproc.findContours(mat, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.findContours(transformed, contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
 
         // remove contours with ratio of dimensions less than DIMENSIONS_RATIO
         MatOfPoint contour = contours.stream()
@@ -42,17 +48,15 @@ public class IndicationImageProcessorImpl implements IndicationImageProcessor {
                     return rect.size.width / rect.size.height > DIMENSIONS_RATIO
                             || rect.size.height / rect.size.width > DIMENSIONS_RATIO;
                 })
-                .max((f, s) -> Double.compare(Imgproc.contourArea(f), Imgproc.contourArea(s)))
+                .max(Comparator.comparingDouble(Imgproc::contourArea))
                 .orElseThrow(() -> new BorderNotFoundException("Unable to detect indication contours"));
 
         // identify corners of target rect
         List<Point[]> borders = findBorderLines(contour);
-        List<Point> corners = findCorners(borders, original.size());
+        List<Point> corners = findCorners(borders, original.size(), cvLogger, original);
 
-        Mat result = new PerspectiveTransformStrategy(
-                (int) Geom.distance(corners.get(0), corners.get(3)),
-                (int) Geom.distance(corners.get(0), corners.get(1)),
-                corners).transform(original);
+        Mat result = new PerspectiveTransformStrategy(corners).transform(original);
+        cvLogger.debug(result, "indication");
         return ImageUtils.matToImage(result);
     }
 
@@ -91,7 +95,8 @@ public class IndicationImageProcessorImpl implements IndicationImageProcessor {
     private MatOfPoint findNumberContour(Mat source) {
         List<MatOfPoint> contours = new ArrayList<>();
         Imgproc.findContours(source.clone(), contours, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_NONE);
-        return contours.stream().max((f, s) -> Double.compare(Imgproc.contourArea(f), Imgproc.contourArea(s))).get();
+        return contours.stream().max(Comparator.comparingDouble(Imgproc::contourArea))
+                .orElseThrow(() -> new RuntimeException("Unable to find number contour"));
     }
 
     private List<Point[]> findBorderLines(MatOfPoint contour) {
@@ -151,7 +156,11 @@ public class IndicationImageProcessorImpl implements IndicationImageProcessor {
         return true;
     }
 
-    private List<Point> findCorners(List<Point[]> borders, Size imageSize) throws BorderNotFoundException {
+    private List<Point> findCorners(List<Point[]> borders,
+                                    Size imageSize,
+                                    CvLogger cvLogger,
+                                    Mat original) throws BorderNotFoundException {
+
         // calculate intersection of all provided borders
         List<Point> corners = new ArrayList<>();
         for (int i = 0; i < borders.size(); i++) {
@@ -163,11 +172,19 @@ public class IndicationImageProcessorImpl implements IndicationImageProcessor {
             }
         }
 
+        // sort corners in following order (tl, tr, br, bl)
+        MatOfInt ouput = new MatOfInt();
+        Imgproc.convexHull(new MatOfPoint(corners.toArray(new Point[0])), ouput, true);
+        corners = ouput.toList().stream().map(corners::get).collect(Collectors.toList());
+        Collections.reverse(corners);
+
         if (!validateCorners(corners)) {
+            cvLogger.error(drawPolygon(original, corners, new Scalar(0, 255, 0)), "IndicationRegion");
             throw new BorderNotFoundException("Detected borders are not a rect");
         }
-        // sort corners in following order (tl, tr, br, bl)
-        return sortCorners(corners);
+
+        cvLogger.info(drawPolygon(original, corners, new Scalar(0, 255, 0)), "IndicationRegion");
+        return corners;
     }
 
     private boolean validateCorners(List<Point> corners) {
@@ -175,43 +192,5 @@ public class IndicationImageProcessorImpl implements IndicationImageProcessor {
         MatOfPoint2f cornersMat = new MatOfPoint2f(Converters.vector_Point2f_to_Mat(corners));
         Imgproc.approxPolyDP(cornersMat, approx, Imgproc.arcLength(cornersMat, true) * 0.02, true);
         return approx.rows() == 4;
-    }
-
-    private List<Point> sortCorners(List<Point> corners) {
-        // find all possible lines which can be produced using provided corners
-        List<Point[]> points = new ArrayList<>();
-        for (int i = 0; i < corners.size(); i++) {
-            for (int j = i + 1; j < corners.size(); j++) {
-                points.add(new Point[]{corners.get(i), corners.get(j)});
-            }
-        }
-
-        // sort lines by length and get the smallest two
-        points = points.stream()
-                .sorted((f, s) -> Double.compare(Geom.distance(f[0], f[1]), Geom.distance(s[0], s[1])))
-                .collect(Collectors.toList());
-        Point center1 = Geom.massCenter(points.get(0));
-        Point center2 = Geom.massCenter(points.get(1));
-
-        // swap found center points if they in wrong order by x axis
-        Point leftCenter = (center1.x > center2.x) ? center2 : center1;
-        Point rightCenter = (center1.x > center2.x) ? center1 : center2;
-
-        // filter corners and get only points which are above the line produced on previous step. Sort filtered points by x coordinate in asc order
-        List<Point> top = corners.stream()
-                .filter(c -> Geom.distance(leftCenter, rightCenter, c) < 0)
-                .sorted((f, s) -> Double.compare(f.x, s.x))
-                .collect(Collectors.toList());
-
-        // filter corners and get only points which are below the line. Sort filtered points by x coordinate in desc order
-        List<Point> bot = corners.stream()
-                .filter(c -> Geom.distance(leftCenter, rightCenter, c) > 0)
-                .sorted((f, s) -> Double.compare(f.x, s.x) * -1)
-                .collect(Collectors.toList());
-
-        corners.clear();
-        corners.addAll(top);
-        corners.addAll(bot);
-        return corners;
     }
 }

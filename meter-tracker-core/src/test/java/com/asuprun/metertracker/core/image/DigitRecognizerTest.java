@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 
 public class DigitRecognizerTest {
 
-    public static final String TRAIN_DATA_PATH = "data/input/digits/train";
+    private static final String TRAIN_DATA_PATH = "data/input/digits/train";
     private DigitRecognizer digitRecognizer;
 
     @Rule
