@@ -12,24 +12,21 @@ import com.asuprun.metertracker.web.dto.IndicationDto;
 import com.asuprun.metertracker.web.filestorage.FileStorage;
 import com.asuprun.metertracker.web.resource.response.ErrorResponse;
 import com.asuprun.metertracker.web.service.IndicationService;
-import com.github.springtestdbunit.DbUnitTestExecutionListener;
-import com.github.springtestdbunit.annotation.DatabaseSetup;
 import org.apache.commons.io.FileUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestExecutionListeners;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ResourceUtils;
 
 import javax.ws.rs.core.MediaType;
@@ -46,14 +43,16 @@ import java.util.stream.Collectors;
 
 import static com.asuprun.metertracker.web.resource.IndicationResource.*;
 import static org.junit.Assert.*;
-import static org.springframework.test.context.TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS;
 
-@Ignore
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {ApplicationConfig.class, RepositoryConfig.class, RestConfig.class})
+@ContextConfiguration(classes = {
+        ApplicationConfig.class,
+        RepositoryConfig.class,
+        RestConfig.class
+})
 @ActiveProfiles(ApplicationConfig.Profiles.TEST)
-@TestExecutionListeners(listeners = {DbUnitTestExecutionListener.class}, mergeMode = MERGE_WITH_DEFAULTS)
-@DatabaseSetup("classpath:datasets/dataset.xml")
+@Transactional
+@Sql("classpath:datasets/default.sql")
 public class IndicationResourceTest {
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
@@ -98,6 +97,7 @@ public class IndicationResourceTest {
     public void testGetAll() {
         Collection<? extends IndicationDto> indications = client.getCollection(IndicationDto.class);
 
+        assertEquals(200, client.getResponse().getStatus());
         assertNotNull(indications);
         assertEquals(4, indications.size());
     }
@@ -213,7 +213,6 @@ public class IndicationResourceTest {
     }
 
     @Test
-    @DirtiesContext
     public void testDelete() {
         client.path(1);
 
@@ -237,7 +236,6 @@ public class IndicationResourceTest {
     }
 
     @Test
-    @DirtiesContext
     public void testUpload() throws IOException, ParseException {
         client.type(MediaType.MULTIPART_FORM_DATA);
 
@@ -258,7 +256,7 @@ public class IndicationResourceTest {
         assertEquals(5, client.getCollection(IndicationDto.class).size());
         assertNull(indication.getValue());
         assertEquals("files?id=78cc2a1a8476aa1b5e8529e860086ddb", indication.getOriginalImageUrl());
-        assertEquals("files?id=241398734986232d17e418f87d46660c", indication.getIndicationImageUrl());
+        assertEquals("files?id=719d4c6e53d6749ea449947c106a2449", indication.getIndicationImageUrl());
         assertTrue(indication.getUploaded().before(new Date()));
         assertEquals(DATE_FORMAT.parse("2015-04-22 08:43:49.255"), indication.getCreated());
         assertEquals("Electricity", indication.getMeterName());
@@ -363,7 +361,6 @@ public class IndicationResourceTest {
     }
 
     @Test
-    @DirtiesContext
     public void testPostDigits() {
         client.path(3).path("digits");
 
@@ -415,7 +412,6 @@ public class IndicationResourceTest {
     }
 
     @Test
-    @DirtiesContext
     public void testPostDigitsNoImage() {
         client.path(3).path("digits");
         List<DigitDto> digits = "01234567".chars()
@@ -433,7 +429,6 @@ public class IndicationResourceTest {
     }
 
     @Test
-    @DirtiesContext
     public void testIndicationValueUpdate() {
         IndicationDto dto = IndicationDto.builder()
                 .withId(4)
@@ -451,7 +446,6 @@ public class IndicationResourceTest {
     }
 
     @Test
-    @DirtiesContext
     public void testIndicationValueUpdateWithSubsequent() {
         IndicationDto dto = IndicationDto.builder()
                 .withId(1)
