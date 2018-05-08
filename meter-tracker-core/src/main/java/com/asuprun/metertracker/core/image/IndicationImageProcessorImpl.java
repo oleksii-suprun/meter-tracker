@@ -14,10 +14,7 @@ import org.opencv.utils.Converters;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.asuprun.metertracker.core.utils.ImageUtils.drawPolygon;
@@ -146,7 +143,8 @@ public class IndicationImageProcessorImpl implements IndicationImageProcessor {
         // calculate center of mass of two provided lines
         Point center = Geom.massCenter(first[0], first[1], second[0], second[1]);
 
-        // identify which point should be start or end of new line after merge; interested points must have the larges distance from center point
+        // identify which point should be start or end of new line after merge;
+        // interested points must have the larges distance from center point
         first[0] = Math.abs(Geom.distance(center, first[0])) > Math.abs(Geom.distance(center, first[1]))
                 ? first[0]
                 : first[1];
@@ -175,8 +173,7 @@ public class IndicationImageProcessorImpl implements IndicationImageProcessor {
         // sort corners in following order (tl, tr, br, bl)
         MatOfInt ouput = new MatOfInt();
         Imgproc.convexHull(new MatOfPoint(corners.toArray(new Point[0])), ouput, true);
-        corners = ouput.toList().stream().map(corners::get).collect(Collectors.toList());
-        Collections.reverse(corners);
+        corners = sortVerticesClockwise(ouput.toList().stream().map(corners::get).collect(Collectors.toList()));
 
         if (!validateCorners(corners)) {
             cvLogger.error(drawPolygon(original, corners, new Scalar(0, 255, 0)), "IndicationRegion");
@@ -192,5 +189,31 @@ public class IndicationImageProcessorImpl implements IndicationImageProcessor {
         MatOfPoint2f cornersMat = new MatOfPoint2f(Converters.vector_Point2f_to_Mat(corners));
         Imgproc.approxPolyDP(cornersMat, approx, Imgproc.arcLength(cornersMat, true) * 0.02, true);
         return approx.rows() == 4;
+    }
+
+    private List<Point> sortVerticesClockwise(List<Point> points) {
+        // find all possible lines which can be produced using provided corners
+        List<Point[]> lines = new ArrayList<>();
+        for (int i = 0; i < points.size(); i++) {
+            lines.add(new Point[]{points.get(i), (i != points.size() - 1) ? points.get(i + 1) : points.get(0)});
+        }
+
+        // find top left corner of a region
+        Point topLeft = Arrays.stream(lines.stream()
+                .sorted(Comparator.comparingDouble(f -> Geom.distance(f[0], f[1])))
+                .limit(2)
+                .min(Comparator.comparingDouble(l -> Geom.massCenter(l).x))
+                .orElseThrow(RuntimeException::new)) // unreal condition
+                .min(Comparator.comparingDouble(p -> p.y))
+                .orElseThrow(RuntimeException::new); // unreal condition
+
+        // create a list with vertexes clockwise using top left as a center (tl, tr, br, bl)
+        List<Point> result = new ArrayList<>();
+        result.add(topLeft);
+        result.addAll(points.stream()
+                .filter(p -> !p.equals(topLeft))
+                .sorted(Comparator.comparingDouble(a -> -1 * Math.atan2(a.x - topLeft.x, a.y - topLeft.y)))
+                .collect(Collectors.toList()));
+        return result;
     }
 }

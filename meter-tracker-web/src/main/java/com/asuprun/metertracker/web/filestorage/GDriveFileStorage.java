@@ -27,7 +27,7 @@ import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static com.asuprun.metertracker.core.utils.FileStorageUtils.resolveTilde;
+import static com.asuprun.metertracker.core.utils.FileUtils.resolveTilde;
 import static java.lang.String.format;
 
 public class GDriveFileStorage implements FileStorage {
