@@ -1,6 +1,6 @@
 package com.asuprun.metertracker.web.filestorage;
 
-import com.asuprun.metertracker.core.utils.FileStorageUtils;
+import com.asuprun.metertracker.core.utils.FileUtils;
 import com.asuprun.metertracker.web.exception.DataConflictException;
 import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
@@ -32,7 +32,7 @@ public class LocalFileStorage implements FileStorage {
     public LocalFileStorage(String homeDirectory) {
         this.homeDirectory = Optional.ofNullable(homeDirectory)
                 .filter(StringUtils::isNotEmpty)
-                .map(FileStorageUtils::resolveTilde)
+                .map(FileUtils::resolveTilde)
                 .orElseThrow(() -> new IllegalStateException("Home directory for file storage is not configured"));
     }
 
