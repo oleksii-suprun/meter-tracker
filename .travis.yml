@@ -1,28 +1,15 @@
 language: java
 
-compiler:
-  - gcc
-
 jdk:
   - oraclejdk8
 
-env:
-  - OPENCV_VERSION=3.4.2
-    OPENCV_HOME=$HOME/opencv-$OPENCV_VERSION
-    OPENCV_JAVA_PATH=$OPENCV_HOME/share/OpenCV/java
-
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 
 cache:
   directories:
-    - $OPENCV_JAVA_PATH
-    - $HOME/.gradle/caches/
+    - $HOME/.gradle/caches/modules-2/
     - $HOME/.gradle/wrapper/
 
-install:
-  - ./install-opencv.sh
-
 script:
-  - ./gradlew clean test
+  - ./gradlew test

@@ -22,11 +22,11 @@ public class TestUtils {
 
     public static boolean compareByContours(BufferedImage img1, BufferedImage img2) {
         List<MatOfPoint> contours1 = new ArrayList<>();
-        Mat mat1 = new GreyscaleTransformStrategy().transform(ImageUtils.imageToMat(img1));
+        Mat mat1 = new GreyscaleTransformStrategy().execute(ImageUtils.imageToMat(img1));
         Imgproc.findContours(mat1, contours1, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
 
         List<MatOfPoint> contours2 = new ArrayList<>();
-        Mat mat2 = new GreyscaleTransformStrategy().transform(ImageUtils.imageToMat(img2));
+        Mat mat2 = new GreyscaleTransformStrategy().execute(ImageUtils.imageToMat(img2));
         Imgproc.findContours(mat2, contours2, new Mat(), Imgproc.RETR_LIST, Imgproc.CHAIN_APPROX_SIMPLE);
 
         if (contours1.size() != contours2.size()) {

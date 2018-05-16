@@ -2,6 +2,7 @@ package com.asuprun.metertracker.core.image;
 
 import com.asuprun.metertracker.core.image.transform.TransformStrategy;
 import com.asuprun.metertracker.core.image.transform.impl.ResizeTransformStrategy;
+import com.asuprun.metertracker.core.utils.OpenCvLoader;
 import com.asuprun.metertracker.core.utils.Settings;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
@@ -23,6 +24,10 @@ import static com.asuprun.metertracker.core.utils.ImageUtils.imageToMat;
 public class DigitRecognizer {
 
     private static final Logger logger = LoggerFactory.getLogger(DigitRecognizer.class);
+
+    static {
+        OpenCvLoader.load();
+    }
 
     private KNearest kNearest;
     private TransformStrategy resizeTransformStrategy;
@@ -78,7 +83,7 @@ public class DigitRecognizer {
 
     private Mat prepareTrainData(Mat mat) {
         Mat floatData = new Mat();
-        resizeTransformStrategy.transform(mat).convertTo(floatData, CvType.CV_32FC1);
+        resizeTransformStrategy.execute(mat).convertTo(floatData, CvType.CV_32FC1);
         return floatData.reshape(1, 1);
     }
 

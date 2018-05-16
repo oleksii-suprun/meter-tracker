@@ -1,3 +1,10 @@
 dependencies {
-    compile name: 'opencv-342'
+
+    if (System.properties.containsKey('javacpp.platform')) {
+        compile 'org.bytedeco.javacpp-presets:opencv:3.4.2-1.4.2'
+        runtime "org.bytedeco.javacpp-presets:opencv:3.4.2-1.4.2:${System.getProperty('javacpp.platform')}"
+    } else {
+        // if platform is not configured add all supported platforms
+        compile 'org.bytedeco.javacpp-presets:opencv-platform:3.4.2-1.4.2'
+    }
 }
