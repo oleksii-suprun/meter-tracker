@@ -1,17 +1,13 @@
 package com.asuprun.metertracker.web.filestorage;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
-import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.client.http.ByteArrayContent;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.client.util.store.DataStoreFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
@@ -20,7 +16,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
@@ -39,19 +35,16 @@ public class GDriveFileStorage implements FileStorage {
     private final GoogleJsonResponseExceptionTranslator translator = new GoogleJsonResponseExceptionTranslator();
 
     private final HttpTransport httpTransport;
-    private final DataStoreFactory dataStoreFactory;
     private final JsonFactory jsonFactory;
     private final String homeDirectoryId;
-    private final java.io.File clientSecretJson;
+    private final java.io.File serviceAccountKeyJson;
 
     public GDriveFileStorage(String googleDriveDirectory,
-                             String clientSecretJson,
-                             DataStoreFactory dataStoreFactory) {
+                             String serviceAccountKeyJson) {
         try {
             this.jsonFactory = JacksonFactory.getDefaultInstance();
             this.httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-            this.clientSecretJson = new java.io.File(resolveTilde(clientSecretJson));
-            this.dataStoreFactory = dataStoreFactory;
+            this.serviceAccountKeyJson = new java.io.File(resolveTilde(serviceAccountKeyJson));
             this.homeDirectoryId = findHomeDirectory(googleDriveDirectory).getId();
         } catch (GeneralSecurityException | IOException e) {
             throw new RuntimeException(e);
@@ -59,8 +52,8 @@ public class GDriveFileStorage implements FileStorage {
     }
 
     private File findHomeDirectory(String homeDirectory) throws IOException {
-        List<File> gfiles;
-        gfiles = driveService().files()
+        List<File> gfiles = driveService()
+                .files()
                 .list()
                 .setQ(format("name = '%s' AND mimeType = 'application/vnd.google-apps.folder'", homeDirectory))
                 .execute()
@@ -146,21 +139,12 @@ public class GDriveFileStorage implements FileStorage {
     }
 
     private Drive driveService() throws IOException {
-        Credential credential = authorize(getClass().getName());
+        Credential credential = GoogleCredential
+                .fromStream(new FileInputStream(serviceAccountKeyJson))
+                .createScoped(Arrays.asList(GOOGLE_DRIVE_SCOPES));
+
         return new Drive.Builder(httpTransport, jsonFactory, credential)
+                .setApplicationName("Meter Tracker")
                 .build();
-    }
-
-    private Credential authorize(String name) throws IOException {
-        // Load client secrets.
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(jsonFactory, new FileReader(clientSecretJson));
-
-        // Build flow and trigger user authorization request.
-        List<String> scopes = Arrays.asList(GOOGLE_DRIVE_SCOPES);
-        GoogleAuthorizationCodeFlow flow =
-                new GoogleAuthorizationCodeFlow.Builder(httpTransport, jsonFactory, clientSecrets, scopes)
-                        .setDataStoreFactory(dataStoreFactory)
-                        .build();
-        return new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize(name);
     }
 }
