@@ -36,8 +36,8 @@ public class GDriveFileStorage implements FileStorage {
 
     private final HttpTransport httpTransport;
     private final JsonFactory jsonFactory;
-    private final String homeDirectoryId;
     private final java.io.File serviceAccountKeyJson;
+    private final String googleDriveDirectory;
 
     public GDriveFileStorage(String googleDriveDirectory,
                              String serviceAccountKeyJson) {
@@ -45,7 +45,7 @@ public class GDriveFileStorage implements FileStorage {
             this.jsonFactory = JacksonFactory.getDefaultInstance();
             this.httpTransport = GoogleNetHttpTransport.newTrustedTransport();
             this.serviceAccountKeyJson = new java.io.File(resolveTilde(serviceAccountKeyJson));
-            this.homeDirectoryId = findHomeDirectory(googleDriveDirectory).getId();
+            this.googleDriveDirectory = googleDriveDirectory;
         } catch (GeneralSecurityException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -110,11 +110,13 @@ public class GDriveFileStorage implements FileStorage {
 
     @Override
     public FileMetaData save(byte[] data, String fileName) {
-        File fileMetadata = new File();
-        fileMetadata.setName(fileName);
-        fileMetadata.setParents(Collections.singletonList(homeDirectoryId));
-
         try {
+            File homeDirectory = findHomeDirectory(googleDriveDirectory);
+
+            File fileMetadata = new File();
+            fileMetadata.setName(fileName);
+            fileMetadata.setParents(Collections.singletonList(homeDirectory.getId()));
+
             ByteArrayContent mediaContent = new ByteArrayContent(null, data);
             File file = driveService().files()
                     .create(fileMetadata, mediaContent)
