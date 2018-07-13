@@ -7,7 +7,9 @@ jdk:
   - oraclejdk8
 
 env:
-  - OPENCV_HOME=$HOME/opencv OPENCV_JAVA_PATH=$OPENCV_HOME/share/OpenCV/java
+  - OPENCV_VERSION=3.4.2
+    OPENCV_HOME=$HOME/opencv-$OPENCV_VERSION
+    OPENCV_JAVA_PATH=$OPENCV_HOME/share/OpenCV/java
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
