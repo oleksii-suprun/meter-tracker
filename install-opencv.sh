@@ -2,14 +2,12 @@
 
 set -e
 
-OPENCV_VERSION=3.4.1
-
-if [[ -d "$OPENCV_JAVA_PATH" && "$(ls -A $OPENCV_JAVA_PATH)" ]]; then
+if [[ -d "$OPENCV_HOME" && "$(ls -A $OPENCV_JAVA_PATH)" ]]; then
     echo "OpenCV already installed. Installation will be skipped."
     exit 0
 fi
 
-echo "OpenCV-$OPENCV_JAVA_PATH is being installed..."
+echo "OpenCV-$OPENCV_VERSION is being installed..."
 git clone https://github.com/opencv/opencv.git --branch $OPENCV_VERSION --depth=1
 cd opencv
 mkdir build
