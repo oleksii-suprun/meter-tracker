@@ -1,6 +1,9 @@
 package com.asuprun.metertracker.web.config;
 
 import com.asuprun.metertracker.web.config.ApplicationConfig.Profiles;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.models.Info;
@@ -73,15 +76,22 @@ public class RestConfig extends JaxRsConfig {
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     @Profile(Profiles.TEST)
-    public WebClient webClient() {
-        WebClient client = WebClient.create(getAddress(), Collections.singletonList(jacksonJsonProvider()));
+    public WebClient webClient(JacksonJsonProvider jacksonJsonProvider) {
+        WebClient client = WebClient.create(getAddress(), Collections.singletonList(jacksonJsonProvider));
         WebClient.getConfig(client).getRequestContext().put(LocalConduit.DIRECT_DISPATCH, Boolean.TRUE);
         return client;
     }
 
     @Bean
-    public JacksonJsonProvider jacksonJsonProvider() {
-        return new JacksonJsonProvider();
+    public JacksonJsonProvider jacksonJsonProvider(ObjectMapper objectMapper) {
+        return new JacksonJsonProvider(objectMapper);
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper()
+                .registerModule(new Jdk8Module())
+                .registerModule(new JavaTimeModule());
     }
 
     private String getAddress() {

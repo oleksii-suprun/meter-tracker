@@ -17,13 +17,17 @@
         .constant('RoutePaths', {
             RECOGNIZE: '/recognize',
             INDICATIONS: '/indications',
-            DEFAULT: '/'
+            DASHBOARD: '/dashboard'
         })
         .config(config);
 
     function config($routeProvider, RoutePaths) {
         $routeProvider
-            .when(RoutePaths.RECOGNIZE, {
+            .when(RoutePaths.DASHBOARD, {
+                templateUrl: 'app/views/dashboard.html',
+                controller: 'DashboardController',
+                controllerAs: 'vm'
+            }).when(RoutePaths.RECOGNIZE, {
                 templateUrl: 'app/views/recognize.html',
                 controller: 'RecognitionController',
                 controllerAs: 'vm'
@@ -31,8 +35,6 @@
                 templateUrl: 'app/views/indication.list.html',
                 controller: 'IndicationListController',
                 controllerAs: 'vm'
-            }).otherwise({
-                redirectTo: RoutePaths.DEFAULT
-            });
+            }).otherwise(RoutePaths.DASHBOARD);
     }
 })();

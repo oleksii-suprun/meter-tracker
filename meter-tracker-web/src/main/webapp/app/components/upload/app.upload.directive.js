@@ -17,12 +17,10 @@
             scope: {
                 targetId: "@appTargetId"
             },
-            link: link
+            link: function (scope, element, attr) {
+                scope.targetId = attr.appTargetId;
+            }
         };
-
-        function link(scope, element, attr) {
-            scope.targetId = attr.appTargetId;
-        }
     }
 
     AppUploadController.$inject = ['Events', 'indicationService', '$rootScope', 'errorMessageService', 'meterService'];

@@ -29,11 +29,11 @@
         init();
 
         this.isIndicationsActive = function() {
-            return $location.path().indexOf(RoutePaths.INDICATIONS) == 0;
+            return $location.path().indexOf(RoutePaths.INDICATIONS) === 0;
         };
 
-        this.isHomeActive = function() {
-            return $location.path() === '' || $location.path() === RoutePaths.DEFAULT;
+        this.isDashboardActive = function() {
+            return $location.path().indexOf(RoutePaths.DASHBOARD) === 0;
         };
 
         function init() {
