@@ -4,10 +4,10 @@ COPY . $HOME/meter-tracker
 
 WORKDIR $HOME/meter-tracker
 
-RUN ./gradlew --no-daemon clean war -Djavacpp.platform=linux-x86_64 \
+RUN ./gradlew --no-daemon clean war -Djavacpp.platform=linux-armhf \
     && mv meter-tracker-web/build/libs/meter-tracker-web-1.0-SNAPSHOT.war /meter-tracker.war
 
-FROM tomcat:8-jre8-slim
+FROM arm32v7/tomcat:8-jre8-slim
 
 LABEL maintainer="Aleksey Suprun <aleksey.suprun@gmail.com>"
 

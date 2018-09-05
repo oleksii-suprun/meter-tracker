@@ -1,15 +1,41 @@
-language: java
+os: linux
+language: generic
 
-jdk:
-  - oraclejdk8
+addons:
+  apt:
+    packages:
+      - docker-ce
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
 
 cache:
   directories:
-    - $HOME/.gradle/caches/modules-2/
+    - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
-script:
-  - ./gradlew test
+env:
+  - JAVACPP_PLATFORM=linux-x86_64
+
+matrix:
+  fast_finish: true
+
+script: ./gradlew clean test -Djavacpp.platform=linux-x86_64
+
+before_deploy:
+  - echo "$DOCKER_PASSWORD" | docker login -u "asuprun" --password-stdin >/dev/null 2>&1
+
+deploy:
+  - provider: script
+    script: |
+      docker build -t asuprun/meter-tracker:amd64 .
+      docker push asuprun/meter-tracker:amd64
+    on:
+      branch: master
+  - provider: script
+    script: |
+      docker build -t asuprun/meter-tracker:arm32v7 -f Dockerfile.arm32v7 .
+      docker push asuprun/meter-tracker:arm32v7
+    on:
+      branch: master
