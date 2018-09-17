@@ -1,10 +1,17 @@
 os: linux
-language: generic
+language: java
+install: skip
 
 addons:
   apt:
     packages:
-      - docker-ce
+    - docker-ce
+    - pass
+
+env:
+  global:
+    - DOCKER_CREDENTIAL_PASS_URL=https://github.com/docker/docker-credential-helpers/releases/download/v0.6.0/docker-credential-pass-v0.6.0-amd64.tar.gz
+    - secure: "Fh4Ve3Ann5zpN9KoOOvb6z0Tl5o0vHqdVj1Y3nrwvpOnCI9I86/9CERaDUeI4Co1lYchoG3YVE92vY3MTMEhKXtHfxVithkVQV7ZCGB18dgj0EZrY+jwm4zS4RtX7OKNg/QqvVkodDkdzUZkZei7Xa2iGYXCBpz5JTFeRFln3bIMsTv9rUTdSue/SWVAU6zo1uFHuzuGnkFFjUrrptozD291ZOxIURBds028CqfxZqvgY28MfHdnHKBaFz3lF3FKylb/MI7vDksOAbhaGUgRxCYo+pfSTzmVlSQtRoq5V0vVUmd9ckR/UkqQy//W9nHJwee8xMVkMq2dXkqkteKRQzcjnzkwmA9H6OLAFGTHZB9yepJpEhUhuHyP1BdOOAPRmyFsE0qHJsFenDJLbsHObFr3dGkl1XE2N7Ho0BR72pNq9AYprqX4R7K+lbceWyrdCcR8kCKfIJPxbb+lCrjJA2w2sZguPizXZbU0phliDAMsh3xbCdAqqt/S4wNYBNL5ko8ouRd+10TwQXnsbYZAw2g6jJWqObokrlqOjttOO67aNg05cVvRg0fgz4ODYR48F1Uozq1ZZ7Dil44HCLTeCrItvwEdji94aXULqBUqGabA8JXny9rtnyhuhegMv8cpgFuvEcL6Ayv+6A8D0/ZAKUQgPLf7DPxR/n7+Gj0WhOY="
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
@@ -15,27 +22,28 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
-env:
-  - JAVACPP_PLATFORM=linux-x86_64
+script:
+  - ./gradlew --no-daemon clean test -Djavacpp.platform=linux-x86_64
 
-matrix:
-  fast_finish: true
-
-script: ./gradlew clean test -Djavacpp.platform=linux-x86_64
+after_success:
+  - curl -fsSL $DOCKER_CREDENTIAL_PASS_URL | sudo tar -xC /usr/local/bin
+  - gpg --batch --gen-key travis-gpg-batch.txt
+  - pass init $(gpg --no-auto-check-trustdb --list-secret-keys | grep ^sec | cut -d/ -f2 | cut -d" " -f1)
 
 before_deploy:
-  - echo "$DOCKER_PASSWORD" | docker login -u "asuprun" --password-stdin >/dev/null 2>&1
+  - echo "$DOCKER_PASSWORD" | docker login -u asuprun --password-stdin
 
 deploy:
   - provider: script
-    script: |
-      docker build -t asuprun/meter-tracker:amd64 .
-      docker push asuprun/meter-tracker:amd64
+    skip_cleanup: true
+    script: docker build -t asuprun/meter-tracker:amd64 . && docker push asuprun/meter-tracker:amd64
     on:
       branch: master
   - provider: script
-    script: |
-      docker build -t asuprun/meter-tracker:arm32v7 -f Dockerfile.arm32v7 .
-      docker push asuprun/meter-tracker:arm32v7
+    skip_cleanup: true
+    script: docker build -t asuprun/meter-tracker:arm32v7 -f Dockerfile.arm32v7 . && docker push asuprun/meter-tracker:arm32v7
     on:
       branch: master
+
+after_deploy:
+  - docker logout
