@@ -3,14 +3,11 @@ package com.asuprun.metertracker.web.config;
 import com.asuprun.metertracker.web.filestorage.FileStorage;
 import com.asuprun.metertracker.web.filestorage.GDriveFileStorage;
 import com.asuprun.metertracker.web.filestorage.LocalFileStorage;
-import org.opencv.core.Core;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.multipart.commons.CommonsMultipartResolver;
-
-import java.nio.file.Paths;
 
 import static com.asuprun.metertracker.web.config.ApplicationConfig.Profiles.NOT_TEST;
 import static com.asuprun.metertracker.web.config.ApplicationConfig.Profiles.TEST;
@@ -22,8 +19,6 @@ public class ApplicationConfig {
 
     static {
         System.setProperty("java.awt.headless", "true");
-        System.load(Paths.get(System.getenv("OPENCV_JAVA_PATH"))
-                .resolve(System.mapLibraryName(Core.NATIVE_LIBRARY_NAME)).toString());
     }
 
     @Bean

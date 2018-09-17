@@ -6,13 +6,8 @@ subprojects {
     targetCompatibility = 1.8
     version = '1.0-SNAPSHOT'
 
-    ext {
-        openCvLibPath = System.getenv('OPENCV_JAVA_PATH')
-    }
-
     repositories {
         mavenCentral()
-        flatDir(name: 'openCvLocalRepo', dirs: "$openCvLibPath")
     }
 
     configurations {
@@ -38,7 +33,6 @@ subprojects {
     test {
         testLogging.exceptionFormat = 'full'
 
-        systemProperty 'java.library.path', "$openCvLibPath"
         systemProperty 'java.awt.headless', true
     }
 }

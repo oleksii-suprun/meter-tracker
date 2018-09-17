@@ -1,6 +1,6 @@
 package com.asuprun.metertracker.core.image.transform.impl;
 
-import com.asuprun.metertracker.core.image.transform.TransformStrategy;
+import com.asuprun.metertracker.core.image.transform.AbstractTransformStrategy;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
@@ -11,7 +11,7 @@ import org.opencv.imgproc.Imgproc;
  * @author asuprun
  * @since 1.0
  */
-public class GaussianBlurTransformStrategy implements TransformStrategy {
+public class GaussianBlurTransformStrategy extends AbstractTransformStrategy {
 
     private final double sigma;
     private final int kernelSize;
@@ -42,7 +42,7 @@ public class GaussianBlurTransformStrategy implements TransformStrategy {
     }
 
     @Override
-    public Mat transform(Mat source) {
+    public Mat execute(Mat source) {
         Mat target = source.clone();
         Imgproc.GaussianBlur(source, target, new Size(kernelSize, kernelSize), sigma);
         return target;

@@ -7,6 +7,7 @@ import com.asuprun.metertracker.core.logger.CvLogger;
 import com.asuprun.metertracker.core.logger.CvLoggerFactory;
 import com.asuprun.metertracker.core.utils.Geom;
 import com.asuprun.metertracker.core.utils.ImageUtils;
+import com.asuprun.metertracker.core.utils.OpenCvLoader;
 import com.asuprun.metertracker.core.utils.Settings;
 import org.opencv.core.*;
 import org.opencv.imgproc.Imgproc;
@@ -22,6 +23,10 @@ import static com.asuprun.metertracker.core.utils.ImageUtils.drawPolygon;
 public class IndicationImageProcessorImpl implements IndicationImageProcessor {
 
     private static final int DIMENSIONS_RATIO = 4;
+
+    static {
+        OpenCvLoader.load();
+    }
 
     @Override
     public BufferedImage extractIndicationRegion(BufferedImage source) throws BorderNotFoundException {
@@ -52,7 +57,7 @@ public class IndicationImageProcessorImpl implements IndicationImageProcessor {
         List<Point[]> borders = findBorderLines(contour);
         List<Point> corners = findCorners(borders, original.size(), cvLogger, original);
 
-        Mat result = new PerspectiveTransformStrategy(corners).transform(original);
+        Mat result = new PerspectiveTransformStrategy(corners).execute(original);
         cvLogger.debug(result, "indication");
         return ImageUtils.matToImage(result);
     }

@@ -2,9 +2,7 @@ package com.asuprun.metertracker.core.image.transform;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 
@@ -14,11 +12,6 @@ import org.opencv.core.Mat;
 public class TransformSequenceTest {
 
     private TransformSequence sequence;
-
-    @BeforeClass
-    public static void beforeClass() {
-        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-    }
 
     @Before
     public void before() {
@@ -41,10 +34,10 @@ public class TransformSequenceTest {
         Assert.assertEquals(3, data[0]);
     }
 
-    private class TestTransformStrategy implements TransformStrategy {
+    private class TestTransformStrategy extends AbstractTransformStrategy {
 
         @Override
-        public Mat transform(Mat source) {
+        public Mat execute(Mat source) {
             byte[] data = new byte[1];
             source.get(0, 0, data);
             data[0]++;

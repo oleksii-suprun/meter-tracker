@@ -1,6 +1,6 @@
 package com.asuprun.metertracker.core.image.transform.impl;
 
-import com.asuprun.metertracker.core.image.transform.TransformStrategy;
+import com.asuprun.metertracker.core.image.transform.AbstractTransformStrategy;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -9,7 +9,7 @@ import org.opencv.imgproc.Imgproc;
 /**
  * Created by asuprun on 1/17/15.
  */
-public class MorphologyTransformStrategy implements TransformStrategy {
+public class MorphologyTransformStrategy extends AbstractTransformStrategy {
 
     private int kWidth;
     private int kHeight;
@@ -24,7 +24,7 @@ public class MorphologyTransformStrategy implements TransformStrategy {
     }
 
     @Override
-    public Mat transform(Mat source) {
+    public Mat execute(Mat source) {
         Mat target = source.clone();
         Imgproc.morphologyEx(source, target, operation, Mat.ones(kHeight, kWidth, CvType.CV_8U), new Point(-1, -1), iterations);
         return target;

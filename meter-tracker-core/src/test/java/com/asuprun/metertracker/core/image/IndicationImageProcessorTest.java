@@ -4,14 +4,11 @@ import com.asuprun.metertracker.TestUtils;
 import com.asuprun.metertracker.core.exception.BorderNotFoundException;
 import com.asuprun.metertracker.core.utils.Settings;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opencv.core.Core;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,12 +33,6 @@ public class IndicationImageProcessorTest {
     private List<BufferedImage> originalImages;
     private List<BufferedImage> extractedImages;
     private IndicationImageProcessor indicationImageProcessor;
-
-    @BeforeClass
-    public static void init() {
-        System.load(Paths.get(System.getenv("OPENCV_JAVA_PATH"))
-                .resolve(System.mapLibraryName(Core.NATIVE_LIBRARY_NAME)).toString());
-    }
 
     @Before
     public void before() throws URISyntaxException, IOException {

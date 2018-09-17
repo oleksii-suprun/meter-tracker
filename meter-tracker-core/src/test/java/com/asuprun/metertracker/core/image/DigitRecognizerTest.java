@@ -1,11 +1,9 @@
 package com.asuprun.metertracker.core.image;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.opencv.core.Core;
 import org.opencv.ml.KNearest;
 
 import javax.imageio.ImageIO;
@@ -28,11 +26,6 @@ public class DigitRecognizerTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
-
-    @BeforeClass
-    public static void init() {
-        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-    }
 
     @Before
     public void before() throws IOException, URISyntaxException {

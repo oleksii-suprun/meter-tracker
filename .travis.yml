@@ -1,28 +1,41 @@
-language: java
+os: linux
+language: generic
 
-compiler:
-  - gcc
-
-jdk:
-  - oraclejdk8
-
-env:
-  - OPENCV_VERSION=3.4.2
-    OPENCV_HOME=$HOME/opencv-$OPENCV_VERSION
-    OPENCV_JAVA_PATH=$OPENCV_HOME/share/OpenCV/java
+addons:
+  apt:
+    packages:
+      - docker-ce
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+  - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
 
 cache:
   directories:
-    - $OPENCV_JAVA_PATH
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
-install:
-  - ./install-opencv.sh
+env:
+  - JAVACPP_PLATFORM=linux-x86_64
 
-script:
-  - ./gradlew clean test
+matrix:
+  fast_finish: true
+
+script: ./gradlew clean test -Djavacpp.platform=linux-x86_64
+
+before_deploy:
+  - echo "$DOCKER_PASSWORD" | docker login -u "asuprun" --password-stdin >/dev/null 2>&1
+
+deploy:
+  - provider: script
+    script: |
+      docker build -t asuprun/meter-tracker:amd64 .
+      docker push asuprun/meter-tracker:amd64
+    on:
+      branch: master
+  - provider: script
+    script: |
+      docker build -t asuprun/meter-tracker:arm32v7 -f Dockerfile.arm32v7 .
+      docker push asuprun/meter-tracker:arm32v7
+    on:
+      branch: master

@@ -7,7 +7,6 @@ import com.asuprun.metertracker.core.image.transform.impl.GreyscaleTransformStra
 import com.asuprun.metertracker.core.image.transform.impl.ThresholdTransformStrategy;
 import com.asuprun.metertracker.core.utils.ImageUtils;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.opencv.core.*;
@@ -32,11 +31,6 @@ import java.util.List;
 public class RecognitionTest {
 
     public static final String NAME = "data/input/full/IMG_0024_IN.JPG";
-
-    @BeforeClass
-    public static void init() {
-        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-    }
 
     @Test
     public void testSplit() throws BorderNotFoundException, IOException, URISyntaxException {

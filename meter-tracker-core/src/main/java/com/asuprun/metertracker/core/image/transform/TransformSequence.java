@@ -11,7 +11,7 @@ import java.util.Queue;
 import static com.asuprun.metertracker.core.utils.ImageUtils.imageToMat;
 import static com.asuprun.metertracker.core.utils.ImageUtils.matToImage;
 
-public class TransformSequence {
+public class TransformSequence extends AbstractTransformStrategy {
 
     private Queue<TransformStrategy> sequence;
     private CvLogger cvLogger;
@@ -34,12 +34,13 @@ public class TransformSequence {
         return matToImage(execute(imageToMat(source)));
     }
 
+    @Override
     public Mat execute(Mat source) {
         if (sequence.isEmpty()) {
             return source;
         }
         TransformStrategy strategy = sequence.remove();
-        Mat transformed = strategy.transform(source);
+        Mat transformed = strategy.execute(source);
         cvLogger.trace(transformed, strategy.getClass().getSimpleName());
         return execute(transformed);
     }

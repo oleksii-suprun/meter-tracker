@@ -17,8 +17,8 @@ public interface TransformStrategy {
      * Executes transformation on provided source image
      *
      * @param source source object
-     * @return copy of source object with applied transform algorithm
+     * @return copy of source object with applied execute algorithm
      * @since 1.0
      */
-    Mat transform(Mat source);
+    Mat execute(Mat source);
 }

@@ -1,6 +1,6 @@
 package com.asuprun.metertracker.core.image.transform.impl;
 
-import com.asuprun.metertracker.core.image.transform.TransformStrategy;
+import com.asuprun.metertracker.core.image.transform.AbstractTransformStrategy;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
@@ -8,7 +8,7 @@ import org.opencv.imgproc.Imgproc;
 /**
  * Created by asuprun on 2/21/15.
  */
-public class ErodeTransformStrategy implements TransformStrategy {
+public class ErodeTransformStrategy extends AbstractTransformStrategy {
     private Size size;
     private int shape;
 
@@ -18,7 +18,7 @@ public class ErodeTransformStrategy implements TransformStrategy {
     }
 
     @Override
-    public Mat transform(Mat source) {
+    public Mat execute(Mat source) {
         Mat target = source.clone();
         Mat kernel = Imgproc.getStructuringElement(shape, size);
         Imgproc.erode(target, source, kernel);
