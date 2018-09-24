@@ -15,7 +15,11 @@ env:
 
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
+  - rm -rf $HOME/.gradle/caches/journal-1
+  - rm -rf $HOME/.gradle/caches/*/fileContent
+  - rm -rf $HOME/.gradle/caches/*/javaCompile
+  - rm -rf $HOME/.gradle/caches/*/fileHashes
+  - rm -rf $HOME/.gradle/caches/*/plugin-resolution
 
 cache:
   directories:
