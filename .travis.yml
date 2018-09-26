@@ -36,6 +36,7 @@ after_success:
 
 before_deploy:
   - echo "$DOCKER_PASSWORD" | docker login -u asuprun --password-stdin
+  - "sed -i '0,/{/s/{/{\n\t\"experimental\": \"enabled\",/' ~/.docker/config.json"
 
 deploy:
   - provider: script
@@ -46,6 +47,11 @@ deploy:
   - provider: script
     skip_cleanup: true
     script: docker build -t asuprun/meter-tracker:arm32v7 -f Dockerfile.arm32v7 . && docker push asuprun/meter-tracker:arm32v7
+    on:
+      branch: master
+  - provider: script
+    skip_cleanup: true
+    script: docker manifest create asuprun/meter-tracker:latest asuprun/meter-tracker:amd64 asuprun/meter-tracker:arm32v7 && docker manifest push asuprun/meter-tracker:latest
     on:
       branch: master
 
