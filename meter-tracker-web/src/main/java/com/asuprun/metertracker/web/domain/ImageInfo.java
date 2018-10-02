@@ -11,7 +11,8 @@ import java.util.Objects;
 public class ImageInfo {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "image_info_id_seq")
+    @SequenceGenerator(name = "image_info_id_seq", sequenceName = "image_info_id_seq", allocationSize = 1)
     private long id;
 
     @Column(name = "storage_id")

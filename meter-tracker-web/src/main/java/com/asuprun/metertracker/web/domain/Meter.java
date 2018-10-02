@@ -8,7 +8,8 @@ import java.util.Objects;
 public class Meter {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "meter_id_seq")
+    @SequenceGenerator(name = "meter_id_seq", sequenceName = "meter_id_seq", allocationSize = 1)
     private long id;
 
     @Column(nullable = false)
