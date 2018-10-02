@@ -2,6 +2,7 @@ package com.asuprun.metertracker.web.config;
 
 import liquibase.integration.spring.SpringLiquibase;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.hibernate.cfg.Environment;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,30 +52,30 @@ public class RepositoryConfig {
 
     @DependsOn("liquibase")
     @Bean
-    public EntityManagerFactory entityManagerFactory() {
+    public EntityManagerFactory entityManagerFactory(DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
         factory.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         factory.setPackagesToScan("com.asuprun.metertracker.web.domain");
-        factory.setDataSource(dataSource());
+        factory.setDataSource(dataSource);
         factory.setJpaPropertyMap(new HashMap<String, Object>() {{
-            put("hibernate.dialect", dialect);
+            put(Environment.DIALECT, dialect);
         }});
         factory.afterPropertiesSet();
         return factory.getObject();
     }
 
     @Bean
-    public PlatformTransactionManager transactionManager() {
+    public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(entityManagerFactory());
+        transactionManager.setEntityManagerFactory(entityManagerFactory);
         return transactionManager;
     }
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    public SpringLiquibase liquibase() {
+    public SpringLiquibase liquibase(DataSource dataSource) {
         SpringLiquibase liquibase = new SpringLiquibase();
-        liquibase.setDataSource(dataSource());
+        liquibase.setDataSource(dataSource);
         liquibase.setChangeLog("classpath:db/changelog/db-changelog-master.yaml");
         return liquibase;
     }

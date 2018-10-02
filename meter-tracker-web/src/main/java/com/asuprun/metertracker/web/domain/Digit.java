@@ -8,7 +8,8 @@ import java.util.Objects;
 public class Digit {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "digit_id_seq")
+    @SequenceGenerator(name = "digit_id_seq", sequenceName = "digit_id_seq", allocationSize = 1)
     private long id;
 
     @Lob

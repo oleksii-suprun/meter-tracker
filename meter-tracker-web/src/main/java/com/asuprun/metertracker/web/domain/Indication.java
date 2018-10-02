@@ -10,7 +10,8 @@ import java.util.Objects;
 public class Indication {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "indication_id_seq")
+    @SequenceGenerator(name = "indication_id_seq", sequenceName = "indication_id_seq", allocationSize = 1)
     private long id;
 
     @Column
